@@ -2,7 +2,8 @@ import Link from "next/link";
 import { ArrowRight, Filter, Search } from "lucide-react";
 import { BookCard } from "@/components/book-card";
 import { SectionHeading } from "@/components/section-heading";
-import { categories, getFilteredBooks } from "@/lib/site-data";
+import { categories } from "@/lib/site-data";
+import { getBrowseBooksFromApi } from "@/lib/api";
 
 function normalizeParam(value: string | string[] | undefined) {
   return Array.isArray(value) ? value[0] : value;
@@ -21,7 +22,7 @@ export default async function BrowseBooksPage({
   const sort = normalizeParam(params.sort) ?? "featured";
   const page = Number.parseInt(normalizeParam(params.page) ?? "1", 10) || 1;
 
-  const filteredBooks = getFilteredBooks({
+  const filteredBooks = await getBrowseBooksFromApi({
     query,
     category,
     status,

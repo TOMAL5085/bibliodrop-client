@@ -4,13 +4,13 @@ import { BookCard } from "@/components/book-card";
 import { SectionHeading } from "@/components/section-heading";
 import {
   categories,
-  getFeaturedBooks,
   providers,
   siteStats,
 } from "@/lib/site-data";
+import { getFeaturedBooksFromApi } from "@/lib/api";
 
-export default function HomePage() {
-  const featuredBooks = getFeaturedBooks();
+export default async function HomePage() {
+  const featuredBooks = await getFeaturedBooksFromApi();
 
   return (
     <div className="space-y-20 pb-20">

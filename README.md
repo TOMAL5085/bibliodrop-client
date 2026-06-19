@@ -21,4 +21,4 @@ npm run lint
 
 - The current UI uses local mock data so it works without a backend connection.
 - The Express API scaffold lives in `bibliodrop-server`.
-
+- Set `NEXT_PUBLIC_API_BASE_URL=http://localhost:5000` to let the public pages read from the API first and fall back to local data when needed.

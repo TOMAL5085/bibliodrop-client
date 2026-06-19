@@ -1,0 +1,168 @@
+import {
+  type Book,
+  getFeaturedBooks,
+  getFilteredBooks,
+  getBookById,
+  getReviewsForBook,
+  getSimilarBooks,
+} from "@/lib/site-data";
+
+type ApiBook = {
+  id: string;
+  title: string;
+  author: string;
+  category: string;
+  deliveryFee: number;
+  status: string;
+  availability: string;
+  provider: string;
+  providerEmail?: string;
+  coverStart?: string;
+  coverEnd?: string;
+  description?: string;
+  rating?: number;
+  reviews?: number;
+  addedAt?: string;
+};
+
+const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL?.replace(/\/$/, "");
+
+async function fetchJson<T>(path: string, init?: RequestInit): Promise<T | null> {
+  if (!apiBaseUrl) {
+    return null;
+  }
+
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 2500);
+
+  try {
+    const response = await fetch(`${apiBaseUrl}${path}`, {
+      ...init,
+      signal: controller.signal,
+      cache: "no-store",
+    });
+
+    if (!response.ok) {
+      return null;
+    }
+
+    return (await response.json()) as T;
+  } catch {
+    return null;
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
+function normalizeApiBook(book: ApiBook) {
+  const localFallback = getBookById(book.id);
+
+  return {
+    id: book.id,
+    title: book.title,
+    author: book.author,
+    category: book.category,
+    deliveryFee: book.deliveryFee,
+    status: (book.status as "published" | "unpublished" | "pending_approval") ?? "published",
+    availability: (book.availability as "Available" | "Checked Out") ?? "Available",
+    provider: book.provider,
+    providerRole: localFallback?.providerRole ?? "book owner",
+    providerAvatar: localFallback?.providerAvatar ?? "BD",
+    coverStart: book.coverStart ?? localFallback?.coverStart ?? "#0f172a",
+    coverEnd: book.coverEnd ?? localFallback?.coverEnd ?? "#334155",
+    description: book.description ?? localFallback?.description ?? "",
+    rating: book.rating ?? localFallback?.rating ?? 4.5,
+    reviews: book.reviews ?? localFallback?.reviews ?? 0,
+    deliveries: localFallback?.deliveries ?? 0,
+    addedAt: book.addedAt ?? localFallback?.addedAt ?? "",
+    featured: localFallback?.featured,
+  };
+}
+
+export async function getFeaturedBooksFromApi() {
+  const response = await fetchJson<{ data: ApiBook[] }>("/api/books");
+  if (!response?.data) {
+    return getFeaturedBooks();
+  }
+
+  return response.data
+    .filter((book) => book.status === "published")
+    .slice(0, 6)
+    .map(normalizeApiBook);
+}
+
+export async function getBrowseBooksFromApi(filters: {
+  query?: string;
+  category?: string;
+  status?: string;
+  fee?: string;
+  sort?: string;
+}): Promise<Book[]> {
+  const booksResponse = await fetchJson<{ data: ApiBook[] }>(
+    `/api/books?${new URLSearchParams(
+      Object.entries(filters)
+        .filter(([, value]) => Boolean(value))
+        .map(([key, value]) => [key, String(value)])
+    ).toString()}`
+  );
+
+  if (!booksResponse?.data) {
+    return getFilteredBooks(filters);
+  }
+
+  let result = booksResponse.data.map(normalizeApiBook);
+
+  if (filters.fee === "under-120") {
+    result = result.filter((book) => book.deliveryFee < 120);
+  } else if (filters.fee === "120-140") {
+    result = result.filter((book) => book.deliveryFee >= 120 && book.deliveryFee <= 140);
+  } else if (filters.fee === "over-140") {
+    result = result.filter((book) => book.deliveryFee > 140);
+  }
+
+  if (filters.sort === "fee-asc") {
+    result = [...result].sort((left, right) => left.deliveryFee - right.deliveryFee);
+  } else if (filters.sort === "fee-desc") {
+    result = [...result].sort((left, right) => right.deliveryFee - left.deliveryFee);
+  } else if (filters.sort === "rating-desc") {
+    result = [...result].sort((left, right) => right.rating - left.rating);
+  }
+
+  return result;
+}
+
+export async function getBookDetailsFromApi(id: string) {
+  const response = await fetchJson<{ data: ApiBook; reviews: Array<{ id: string; userEmail?: string; user?: string; date?: string; rating: number; comment: string; verified?: boolean }> }>(
+    `/api/books/${id}`
+  );
+
+  if (!response?.data) {
+    const localBook = getBookById(id);
+    if (!localBook) {
+      return null;
+    }
+
+    return {
+      book: localBook,
+      reviews: getReviewsForBook(id),
+      similarBooks: getSimilarBooks(localBook),
+    };
+  }
+
+  const localBook = getBookById(id);
+  const book = normalizeApiBook(response.data);
+  const reviews = response.reviews.map((review) => ({
+    id: review.id,
+    user: review.user ?? review.userEmail ?? "Reader",
+    date: review.date ?? "",
+    rating: review.rating,
+    comment: review.comment,
+    verified: review.verified ?? false,
+  }));
+
+  return {
+    book,
+    reviews,
+    similarBooks: localBook ? getSimilarBooks(localBook) : [],
+  };
+}

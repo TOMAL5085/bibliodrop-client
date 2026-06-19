@@ -4,11 +4,8 @@ import { notFound } from "next/navigation";
 import { ArrowRight, BadgeCheck, BookMarked, Lock, Star, Truck } from "lucide-react";
 import { BookCard } from "@/components/book-card";
 import { SectionHeading } from "@/components/section-heading";
-import {
-  getBookById,
-  getReviewsForBook,
-  getSimilarBooks,
-} from "@/lib/site-data";
+import { getBookDetailsFromApi } from "@/lib/api";
+import { getBookById } from "@/lib/site-data";
 
 export async function generateMetadata({
   params,
@@ -16,7 +13,8 @@ export async function generateMetadata({
   params: Promise<{ id: string }>;
 }): Promise<Metadata> {
   const { id } = await params;
-  const book = getBookById(id);
+  const details = await getBookDetailsFromApi(id);
+  const book = details?.book ?? getBookById(id);
 
   if (!book) {
     return {
@@ -36,14 +34,15 @@ export default async function BookDetailsPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const book = getBookById(id);
+  const details = await getBookDetailsFromApi(id);
+  const book = details?.book ?? getBookById(id);
 
   if (!book || book.status !== "published") {
     notFound();
   }
 
-  const reviews = getReviewsForBook(book.id);
-  const similarBooks = getSimilarBooks(book);
+  const reviews = details?.reviews ?? [];
+  const similarBooks = details?.similarBooks ?? [];
   const requestDisabled = book.availability === "Checked Out";
 
   return (
