@@ -1,7 +1,53 @@
+"use client";
+
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { BookOpen, Lock, Mail, ShieldCheck, Sparkles } from "lucide-react";
+import toast from "react-hot-toast";
+import { loginUser } from "@/lib/api";
 
 export default function LoginPage() {
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
+
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+
+    const email = String(formData.get("email") || "").trim();
+    const password = String(formData.get("password") || "");
+
+    if (!email || !password) {
+      toast.error("Email and password are required.");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const response = await loginUser({ email, password });
+
+      if (!response?.user) {
+        toast.error("Login failed. Please check your credentials.");
+        return;
+      }
+
+      toast.success(`Welcome back, ${response.user.name}.`);
+
+      if (response.user.role === "admin") {
+        router.push("/dashboard/admin");
+      } else if (response.user.role === "librarian") {
+        router.push("/dashboard/librarian");
+      } else {
+        router.push("/dashboard/user");
+      }
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Login failed.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
   return (
     <div className="mx-auto grid min-h-[calc(100vh-180px)] max-w-7xl gap-8 px-4 py-10 sm:px-6 lg:grid-cols-[0.95fr_1.05fr] lg:px-8">
       <div className="rounded-[2.5rem] bg-slate-950 p-8 text-white">
@@ -11,7 +57,7 @@ export default function LoginPage() {
         </h1>
         <p className="mt-5 max-w-xl text-sm leading-7 text-slate-300">
           The assignment calls for Better Auth, Google login, and JWT-backed protected routes.
-          This interface is scaffolded for that integration.
+          This interface now talks to the Express auth route.
         </p>
 
         <div className="mt-8 space-y-4">
@@ -34,15 +80,17 @@ export default function LoginPage() {
       </div>
 
       <div className="glass-panel rounded-[2.5rem] p-8">
-        <form className="space-y-5">
+        <form className="space-y-5" onSubmit={handleSubmit}>
           <div>
             <label className="text-sm font-medium text-slate-700">Email</label>
             <div className="mt-2 flex items-center gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3">
               <Mail className="h-4 w-4 text-slate-400" />
               <input
+                name="email"
                 type="email"
                 placeholder="you@example.com"
                 className="w-full bg-transparent text-sm outline-none"
+                autoComplete="email"
               />
             </div>
           </div>
@@ -52,9 +100,11 @@ export default function LoginPage() {
             <div className="mt-2 flex items-center gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3">
               <Lock className="h-4 w-4 text-slate-400" />
               <input
+                name="password"
                 type="password"
                 placeholder="Enter your password"
                 className="w-full bg-transparent text-sm outline-none"
+                autoComplete="current-password"
               />
             </div>
           </div>
@@ -69,8 +119,12 @@ export default function LoginPage() {
             </Link>
           </div>
 
-          <button className="w-full rounded-full bg-slate-950 px-6 py-3 text-sm font-semibold text-white">
-            Login
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full rounded-full bg-slate-950 px-6 py-3 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {loading ? "Logging in..." : "Login"}
           </button>
 
           <div className="relative py-2 text-center text-sm text-slate-400">

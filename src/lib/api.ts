@@ -40,6 +40,7 @@ async function fetchJson<T>(path: string, init?: RequestInit): Promise<T | null>
       ...init,
       signal: controller.signal,
       cache: "no-store",
+      credentials: "include",
     });
 
     if (!response.ok) {
@@ -165,4 +166,40 @@ export async function getBookDetailsFromApi(id: string) {
     reviews,
     similarBooks: localBook ? getSimilarBooks(localBook) : [],
   };
+}
+
+export async function loginUser(payload: { email: string; password: string }) {
+  const response = await fetchJson<{
+    user: { id: string; name: string; email: string; role: string; photoUrl?: string };
+    token: string;
+  }>("/api/auth/login", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+
+  return response;
+}
+
+export async function registerUser(payload: {
+  name: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+  photoUrl?: string;
+  role: "user" | "librarian";
+}) {
+  const response = await fetchJson<{
+    user: { id: string; name: string; email: string; role: string; photoUrl?: string };
+  }>("/api/auth/register", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+
+  return response;
 }
