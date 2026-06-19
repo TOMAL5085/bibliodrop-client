@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { BookOpen, Lock, Mail, ShieldCheck, Sparkles } from "lucide-react";
 import toast from "react-hot-toast";
@@ -9,6 +9,7 @@ import { loginUser } from "@/lib/api";
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [loading, setLoading] = useState(false);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
@@ -33,6 +34,12 @@ export default function LoginPage() {
       }
 
       toast.success(`Welcome back, ${response.user.name}.`);
+
+      const nextPath = searchParams.get("next");
+      if (nextPath?.startsWith("/dashboard")) {
+        router.push(nextPath);
+        return;
+      }
 
       if (response.user.role === "admin") {
         router.push("/dashboard/admin");

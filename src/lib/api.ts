@@ -203,3 +203,17 @@ export async function registerUser(payload: {
 
   return response;
 }
+
+export async function getSession() {
+  const response = await fetchJson<{
+    user: { id: string; name: string; email: string; role: string; photoUrl?: string };
+  }>("/api/me");
+
+  return response;
+}
+
+export async function logoutUser() {
+  await fetchJson<{ ok: boolean }>("/api/auth/logout", {
+    method: "POST",
+  });
+}
