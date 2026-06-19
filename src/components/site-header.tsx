@@ -1,9 +1,10 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useMemo, useState } from "react";
-import { BookOpenText, Menu, X, LogIn, LogOut, LayoutDashboard } from "lucide-react";
+import { Menu, X, LogIn, LogOut, LayoutDashboard } from "lucide-react";
 
 const navItems = [
   { href: "/", label: "Home" },
@@ -19,6 +20,7 @@ const dashboardItems = [
 export function SiteHeader() {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [dashboardOpen, setDashboardOpen] = useState(false);
 
   const currentDashboardLabel = useMemo(() => {
     const match = dashboardItems.find((item) => pathname.startsWith(item.href));
@@ -29,8 +31,15 @@ export function SiteHeader() {
     <header className="sticky top-0 z-50 border-b border-slate-200/80 bg-white/85 backdrop-blur-xl">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
         <Link href="/" className="flex items-center gap-3">
-          <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-slate-950 text-white shadow-lg shadow-slate-950/20">
-            <BookOpenText className="h-5 w-5" />
+          <span className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-[1.15rem] bg-slate-950 shadow-sm ring-1 ring-slate-200">
+            <Image
+              src="/bibliodrop-navbar-logo.png"
+              alt="BiblioDrop logo"
+              width={48}
+              height={48}
+              priority
+              className="h-full w-full object-cover"
+            />
           </span>
           <span className="space-y-0.5">
             <span className="block text-base font-semibold tracking-[0.2em] text-slate-950">
@@ -49,6 +58,7 @@ export function SiteHeader() {
               <Link
                 key={item.href}
                 href={item.href}
+                onClick={() => setDashboardOpen(false)}
                 className={`text-sm font-medium transition ${
                   active ? "text-slate-950" : "text-slate-600 hover:text-slate-950"
                 }`}
@@ -58,16 +68,29 @@ export function SiteHeader() {
             );
           })}
 
-          <div className="group relative">
-            <button className="flex items-center gap-2 text-sm font-medium text-slate-600 transition hover:text-slate-950">
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => setDashboardOpen((value) => !value)}
+              className="flex items-center gap-2 text-sm font-medium text-slate-600 transition hover:text-slate-950"
+              aria-haspopup="menu"
+              aria-expanded={dashboardOpen}
+            >
               <LayoutDashboard className="h-4 w-4" />
               {currentDashboardLabel}
             </button>
-            <div className="invisible absolute left-0 top-full mt-3 w-56 translate-y-1 rounded-3xl border border-slate-200 bg-white p-2 opacity-0 shadow-xl shadow-slate-950/5 transition duration-150 group-hover:visible group-hover:translate-y-0 group-hover:opacity-100">
+            <div
+              className={`absolute left-0 top-full mt-3 w-56 rounded-3xl border border-slate-200 bg-white p-2 shadow-xl shadow-slate-950/5 transition duration-150 ${
+                dashboardOpen
+                  ? "visible translate-y-0 opacity-100"
+                  : "invisible translate-y-1 opacity-0"
+              }`}
+            >
               {dashboardItems.map((item) => (
                 <Link
                   key={item.href}
                   href={item.href}
+                  onClick={() => setDashboardOpen(false)}
                   className="flex rounded-2xl px-4 py-3 text-sm text-slate-600 transition hover:bg-slate-100 hover:text-slate-950"
                 >
                   {item.label}
@@ -80,6 +103,7 @@ export function SiteHeader() {
         <div className="hidden items-center gap-3 md:flex">
           <Link
             href="/login"
+            onClick={() => setDashboardOpen(false)}
             className="inline-flex items-center gap-2 rounded-full border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:border-slate-950 hover:text-slate-950"
           >
             <LogIn className="h-4 w-4" />
@@ -87,6 +111,7 @@ export function SiteHeader() {
           </Link>
           <Link
             href="/register"
+            onClick={() => setDashboardOpen(false)}
             className="inline-flex items-center gap-2 rounded-full bg-slate-950 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-800"
           >
             <LogOut className="h-4 w-4" />
@@ -111,7 +136,10 @@ export function SiteHeader() {
               <Link
                 key={item.href}
                 href={item.href}
-                onClick={() => setMobileOpen(false)}
+                onClick={() => {
+                  setMobileOpen(false);
+                  setDashboardOpen(false);
+                }}
                 className="rounded-2xl px-4 py-3 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
               >
                 {item.label}
@@ -121,7 +149,10 @@ export function SiteHeader() {
               <Link
                 key={item.href}
                 href={item.href}
-                onClick={() => setMobileOpen(false)}
+                onClick={() => {
+                  setMobileOpen(false);
+                  setDashboardOpen(false);
+                }}
                 className="rounded-2xl px-4 py-3 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
               >
                 {item.label}
@@ -130,7 +161,10 @@ export function SiteHeader() {
             <div className="grid grid-cols-2 gap-3 pt-2">
               <Link
                 href="/login"
-                onClick={() => setMobileOpen(false)}
+                onClick={() => {
+                  setMobileOpen(false);
+                  setDashboardOpen(false);
+                }}
                 className="inline-flex items-center justify-center gap-2 rounded-full border border-slate-300 px-4 py-3 text-sm font-medium text-slate-700"
               >
                 <LogIn className="h-4 w-4" />
@@ -138,7 +172,10 @@ export function SiteHeader() {
               </Link>
               <Link
                 href="/register"
-                onClick={() => setMobileOpen(false)}
+                onClick={() => {
+                  setMobileOpen(false);
+                  setDashboardOpen(false);
+                }}
                 className="inline-flex items-center justify-center gap-2 rounded-full bg-slate-950 px-4 py-3 text-sm font-medium text-white"
               >
                 <LogOut className="h-4 w-4" />
