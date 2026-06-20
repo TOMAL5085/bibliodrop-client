@@ -25,7 +25,11 @@ type ApiBook = {
   addedAt?: string;
 };
 
-const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL?.replace(/\/$/, "");
+const apiBaseUrl =
+  process.env.NEXT_PUBLIC_API_BASE_URL?.replace(/\/$/, "") ||
+  (typeof window === "undefined" && process.env.VERCEL_URL
+    ? `https://${process.env.VERCEL_URL}`
+    : "");
 
 async function fetchJson<T>(path: string, init?: RequestInit): Promise<T | null> {
   if (!apiBaseUrl) {
