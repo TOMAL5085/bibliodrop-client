@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getBooksFromApi } from "@/lib/server-state";
+import { getBooksFromApi } from "@/lib/persistence";
 
 export function GET(request: NextRequest) {
   const filters = {

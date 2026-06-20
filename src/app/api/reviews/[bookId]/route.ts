@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { reviews } from "@/lib/server-state";
+import { listReviewsByBookId } from "@/lib/persistence";
 
 type Params = {
   params: Promise<{ bookId: string }>;
@@ -7,5 +7,5 @@ type Params = {
 
 export async function GET(_request: Request, { params }: Params) {
   const { bookId } = await params;
-  return NextResponse.json({ data: reviews.filter((review) => review.bookId === bookId) });
+  return NextResponse.json({ data: await listReviewsByBookId(bookId) });
 }

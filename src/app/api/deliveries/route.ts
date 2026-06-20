@@ -1,43 +1,27 @@
 import { NextResponse } from "next/server";
-import { deliveries, transactions } from "@/lib/server-state";
+import { createDeliveryRequest, listDeliveries } from "@/lib/persistence";
 
-export function GET() {
-  return NextResponse.json({ data: deliveries });
+export async function GET() {
+  const data = await listDeliveries();
+  return NextResponse.json({ data });
 }
 
 export async function POST(request: Request) {
   const body = (await request.json().catch(() => null)) as
-    | { bookId?: string; userEmail?: string; librarianEmail?: string; amount?: number }
+    | { bookId?: string; userEmail?: string }
     | null;
 
   const bookId = body?.bookId ?? "";
   const userEmail = body?.userEmail ?? "";
-  const librarianEmail = body?.librarianEmail ?? "";
-  const amount = Number(body?.amount ?? 0);
 
-  if (!bookId || !userEmail || !librarianEmail || !amount) {
+  if (!bookId || !userEmail) {
     return NextResponse.json({ message: "Missing required fields" }, { status: 400 });
   }
 
-  const requestDate = new Date().toISOString().slice(0, 10);
-  const requestItem = {
-    id: `d${deliveries.length + 1}`,
-    userEmail,
-    librarianEmail,
-    bookId,
-    status: "Pending" as const,
-    amount,
-    date: requestDate,
-  };
-
-  deliveries.push(requestItem);
-  transactions.push({
-    id: `txn_${transactions.length + 1}`,
-    userEmail,
-    librarianEmail,
-    amount,
-    date: requestDate,
-  });
+  const requestItem = await createDeliveryRequest({ bookId, userEmail });
+  if (!requestItem) {
+    return NextResponse.json({ message: "Book not found" }, { status: 404 });
+  }
 
   return NextResponse.json({ data: requestItem }, { status: 201 });
 }

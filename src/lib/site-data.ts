@@ -11,6 +11,7 @@ export type Book = {
   status: BookStatus;
   availability: "Available" | "Checked Out";
   provider: string;
+  providerEmail?: string;
   providerRole: "librarian" | "book owner";
   providerAvatar: string;
   coverStart: string;

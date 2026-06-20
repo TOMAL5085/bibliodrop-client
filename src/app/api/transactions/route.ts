@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { transactions } from "@/lib/server-state";
+import { listTransactions } from "@/lib/persistence";
 
-export function GET() {
-  return NextResponse.json({ data: transactions });
+export async function GET() {
+  return NextResponse.json({ data: await listTransactions() });
 }

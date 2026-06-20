@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   },
   description:
     "BiblioDrop is an online book delivery management system for readers, librarians, and administrators.",
-  metadataBase: new URL("https://bibliodrop.local"),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"),
 };
 
 export default function RootLayout({

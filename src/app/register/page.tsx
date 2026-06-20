@@ -2,14 +2,18 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, type ChangeEvent } from "react";
 import { Camera, Lock, Mail, User } from "lucide-react";
 import toast from "react-hot-toast";
-import { registerUser } from "@/lib/api";
+import { registerUser, uploadImage } from "@/lib/api";
+import type { AppRole } from "@/lib/auth-user";
 
 export default function RegisterPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const [photoUrl, setPhotoUrl] = useState("");
+  const [uploadedFileName, setUploadedFileName] = useState("");
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -19,8 +23,7 @@ export default function RegisterPage() {
     const email = String(formData.get("email") || "").trim();
     const password = String(formData.get("password") || "");
     const confirmPassword = String(formData.get("confirmPassword") || "");
-    const photoUrl = String(formData.get("photoUrl") || "").trim();
-    const role = String(formData.get("role") || "user") as "user" | "librarian";
+    const role = String(formData.get("role") || "user") as AppRole;
 
     if (!name || !email || !password || !confirmPassword) {
       toast.error("Please fill in all required fields.");
@@ -49,11 +52,37 @@ export default function RegisterPage() {
       }
 
       toast.success("Registration successful. Welcome to BiblioDrop.");
-      router.push("/");
+      router.push("/dashboard");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Registration failed.");
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function handlePhotoUpload(event: ChangeEvent<HTMLInputElement>) {
+    const input = event.currentTarget;
+    const file = input.files?.[0];
+    if (!file) {
+      return;
+    }
+
+    setUploadingPhoto(true);
+    try {
+      const url = await uploadImage(file);
+      if (!url) {
+        toast.error("Image upload failed. Please try again.");
+        return;
+      }
+
+      setPhotoUrl(url);
+      setUploadedFileName(file.name);
+      toast.success("Profile image uploaded.");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Image upload failed.");
+    } finally {
+      setUploadingPhoto(false);
+      input.value = "";
     }
   }
 
@@ -65,15 +94,15 @@ export default function RegisterPage() {
           Register as a reader or a librarian.
         </h1>
         <p className="mt-5 max-w-xl text-sm leading-7 text-slate-600">
-          The form now talks to the Express registration route and supports the required role,
-          email, password, and photo URL fields.
+          The form now talks directly to the Vercel-hosted API, supports profile image uploads,
+          and stores the role in MongoDB for dashboard routing.
         </p>
 
         <div className="mt-8 rounded-[2rem] border border-slate-200 bg-white p-5">
           <p className="text-sm font-semibold text-slate-950">Submission defaults</p>
           <p className="mt-2 text-sm leading-7 text-slate-600">
-            Successful registration redirects to Home, and login will route users to the right
-            dashboard based on the saved role.
+            Successful registration signs the user in and sends them to the dashboard, where the
+            saved role routes them to the correct view.
           </p>
         </div>
       </div>
@@ -160,12 +189,17 @@ export default function RegisterPage() {
                   type="url"
                   placeholder="https://..."
                   className="w-full bg-transparent text-sm outline-none"
+                  value={photoUrl}
+                  onChange={(event) => setPhotoUrl(event.target.value)}
                 />
               </div>
+              {uploadedFileName ? (
+                <p className="mt-2 text-xs text-slate-500">Uploaded: {uploadedFileName}</p>
+              ) : null}
             </div>
             <label className="flex cursor-pointer items-center justify-center rounded-2xl border border-dashed border-slate-300 px-5 py-3 text-sm font-semibold text-slate-700">
-              Upload image
-              <input type="file" className="hidden" />
+              {uploadingPhoto ? "Uploading..." : "Upload image"}
+              <input type="file" accept="image/*" className="hidden" onChange={handlePhotoUpload} />
             </label>
           </div>
 

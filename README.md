@@ -19,6 +19,7 @@ npm run lint
 
 ## Notes
 
-- The current UI uses local mock data so it works without a backend connection.
-- The app now exposes its own API routes under `src/app/api`, so it can run on Vercel without a separate Express backend.
-- Leave `NEXT_PUBLIC_API_BASE_URL` empty unless you intentionally deploy a separate backend elsewhere.
+- Deploy this as the client Vercel project.
+- Set `NEXT_PUBLIC_BASE_URL` to the client URL and `NEXT_PUBLIC_API_BASE_URL` to the server URL.
+- Google sign-in, MongoDB auth, and image uploads now live on the `bibliodrop-server` project.
+- The server project owns `MONGODB_URI`, `BETTER_AUTH_SECRET`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, and `IMGBB_API_KEY`.

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { getBookDetailsFromApi } from "@/lib/server-state";
+import { listReviewsByBookId } from "@/lib/persistence";
+import { getBookById, getSimilarBooks } from "@/lib/site-data";
 
 type Params = {
   params: Promise<{ id: string }>;
@@ -7,15 +8,15 @@ type Params = {
 
 export async function GET(_request: Request, { params }: Params) {
   const { id } = await params;
-  const payload = getBookDetailsFromApi(id);
+  const book = getBookById(id);
 
-  if (!payload) {
+  if (!book) {
     return NextResponse.json({ message: "Book not found" }, { status: 404 });
   }
 
   return NextResponse.json({
-    data: payload.book,
-    reviews: payload.reviews,
-    similarBooks: payload.similarBooks,
+    data: book,
+    reviews: await listReviewsByBookId(id),
+    similarBooks: getSimilarBooks(book),
   });
 }

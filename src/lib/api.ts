@@ -6,6 +6,7 @@ import {
   getReviewsForBook,
   getSimilarBooks,
 } from "@/lib/site-data";
+import { normalizeUser, type AppRole } from "@/lib/auth-user";
 
 type ApiBook = {
   id: string;
@@ -27,21 +28,56 @@ type ApiBook = {
 
 const apiBaseUrl =
   process.env.NEXT_PUBLIC_API_BASE_URL?.replace(/\/$/, "") ||
+  process.env.NEXT_PUBLIC_BASE_URL?.replace(/\/$/, "") ||
   (typeof window === "undefined" && process.env.VERCEL_URL
     ? `https://${process.env.VERCEL_URL}`
     : "");
 
-async function fetchJson<T>(path: string, init?: RequestInit): Promise<T | null> {
-  if (!apiBaseUrl) {
+const authTokenKey = "bibliodrop_auth_token";
+
+function getStoredAuthToken() {
+  if (typeof window === "undefined") {
     return null;
   }
 
+  return window.localStorage.getItem(authTokenKey);
+}
+
+function storeAuthToken(token: string | null | undefined) {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  if (!token) {
+    window.localStorage.removeItem(authTokenKey);
+    return;
+  }
+
+  window.localStorage.setItem(authTokenKey, token);
+}
+
+function resolveApiUrl(path: string) {
+  if (apiBaseUrl) {
+    return `${apiBaseUrl}${path}`;
+  }
+
+  return path;
+}
+
+async function fetchJson<T>(path: string, init?: RequestInit): Promise<T | null> {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 2500);
+  const token = getStoredAuthToken();
 
   try {
-    const response = await fetch(`${apiBaseUrl}${path}`, {
+    const headers = new Headers(init?.headers);
+    if (token && !headers.has("Authorization")) {
+      headers.set("Authorization", `Bearer ${token}`);
+    }
+
+    const response = await fetch(resolveApiUrl(path), {
       ...init,
+      headers,
       signal: controller.signal,
       cache: "no-store",
       credentials: "include",
@@ -57,6 +93,17 @@ async function fetchJson<T>(path: string, init?: RequestInit): Promise<T | null>
   } finally {
     clearTimeout(timeout);
   }
+}
+
+function toAppUser(user: {
+  id: string;
+  name: string;
+  email: string;
+  image?: string | null;
+  role?: string | null;
+  photoUrl?: string | null;
+}) {
+  return normalizeUser(user);
 }
 
 function normalizeApiBook(book: ApiBook) {
@@ -174,7 +221,7 @@ export async function getBookDetailsFromApi(id: string) {
 
 export async function loginUser(payload: { email: string; password: string }) {
   const response = await fetchJson<{
-    user: { id: string; name: string; email: string; role: string; photoUrl?: string };
+    user: { id: string; name: string; email: string; image?: string | null; role?: string | null };
     token: string;
   }>("/api/auth/login", {
     method: "POST",
@@ -184,7 +231,16 @@ export async function loginUser(payload: { email: string; password: string }) {
     body: JSON.stringify(payload),
   });
 
-  return response;
+  if (!response?.user) {
+    return null;
+  }
+
+  storeAuthToken(response.token);
+
+  return {
+    user: toAppUser(response.user),
+    token: response.token,
+  };
 }
 
 export async function registerUser(payload: {
@@ -193,31 +249,92 @@ export async function registerUser(payload: {
   password: string;
   confirmPassword: string;
   photoUrl?: string;
-  role: "user" | "librarian";
+  role: AppRole;
 }) {
   const response = await fetchJson<{
-    user: { id: string; name: string; email: string; role: string; photoUrl?: string };
+    user: { id: string; name: string; email: string; image?: string | null; role?: string | null };
+    token: string | null;
   }>("/api/auth/register", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify(payload),
+    body: JSON.stringify({
+      name: payload.name,
+      email: payload.email,
+      password: payload.password,
+      image: payload.photoUrl || undefined,
+      role: payload.role,
+    }),
   });
 
-  return response;
+  if (!response?.user) {
+    return null;
+  }
+
+  storeAuthToken(response.token);
+
+  return {
+    user: toAppUser(response.user),
+    token: response.token,
+  };
 }
 
-export async function getSession() {
+export async function startGoogleSignIn(callbackURL: string) {
   const response = await fetchJson<{
-    user: { id: string; name: string; email: string; role: string; photoUrl?: string };
-  }>("/api/me");
+    url: string;
+    redirect: boolean;
+  }>("/api/auth/google/start", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      providerId: "google",
+      callbackURL,
+      disableRedirect: true,
+    }),
+  });
 
   return response;
 }
 
 export async function logoutUser() {
+  storeAuthToken(null);
+
   await fetchJson<{ ok: boolean }>("/api/auth/logout", {
     method: "POST",
   });
+}
+
+export async function getSession() {
+  const response = await fetchJson<{
+    user: { id: string; name: string; email: string; image?: string | null; role?: string | null };
+  }>("/api/me");
+
+  if (!response?.user) {
+    return null;
+  }
+
+  return {
+    user: toAppUser(response.user),
+  };
+}
+
+export async function uploadImage(file: File) {
+  const formData = new FormData();
+  formData.append("file", file);
+
+  const response = await fetch(resolveApiUrl("/api/uploads/image"), {
+    method: "POST",
+    body: formData,
+    credentials: "include",
+  });
+
+  if (!response.ok) {
+    return null;
+  }
+
+  const data = (await response.json().catch(() => null)) as { url?: string } | null;
+  return data?.url ?? null;
 }

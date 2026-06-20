@@ -5,12 +5,13 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { BookOpen, Lock, Mail, ShieldCheck, Sparkles } from "lucide-react";
 import toast from "react-hot-toast";
-import { loginUser } from "@/lib/api";
+import { loginUser, startGoogleSignIn } from "@/lib/api";
 
 export default function LoginPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -55,6 +56,29 @@ export default function LoginPage() {
     }
   }
 
+  async function handleGoogleSignIn() {
+    setGoogleLoading(true);
+
+    try {
+      const nextPath = searchParams.get("next");
+      const callbackURL = nextPath?.startsWith("/dashboard") ? nextPath : "/dashboard";
+      const response = await startGoogleSignIn(
+        `${window.location.origin}${callbackURL.startsWith("/") ? callbackURL : `/${callbackURL}`}`
+      );
+
+      if (!response?.url) {
+        toast.error("Google sign-in is not configured yet.");
+        return;
+      }
+
+      window.location.assign(response.url);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Google sign-in failed.");
+    } finally {
+      setGoogleLoading(false);
+    }
+  }
+
   return (
     <div className="mx-auto grid min-h-[calc(100vh-180px)] max-w-7xl gap-8 px-4 py-10 sm:px-6 lg:grid-cols-[0.95fr_1.05fr] lg:px-8">
       <div className="rounded-[2.5rem] bg-slate-950 p-8 text-white">
@@ -63,8 +87,8 @@ export default function LoginPage() {
           Sign in to request books, manage inventory, or approve deliveries.
         </h1>
         <p className="mt-5 max-w-xl text-sm leading-7 text-slate-300">
-          The assignment calls for Better Auth, Google login, and JWT-backed protected routes.
-          This interface now talks to the Express auth route.
+          Sign in with email/password or Google. Your session is saved against the Vercel-hosted
+          API so it survives refreshes.
         </p>
 
         <div className="mt-8 space-y-4">
@@ -141,9 +165,11 @@ export default function LoginPage() {
 
           <button
             type="button"
+            onClick={handleGoogleSignIn}
+            disabled={googleLoading}
             className="w-full rounded-full border border-slate-300 px-6 py-3 text-sm font-semibold text-slate-700"
           >
-            Continue with Google
+            {googleLoading ? "Opening Google..." : "Continue with Google"}
           </button>
         </form>
       </div>

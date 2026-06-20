@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getDashboardPayload } from "@/lib/server-state";
+import { getDashboardPayload } from "@/lib/persistence";
 
 type Params = {
   params: Promise<{ role: string }>;
