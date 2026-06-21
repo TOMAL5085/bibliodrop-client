@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowRight, BookOpen, Sparkles, Truck, Users } from "lucide-react";
 import { BookCard } from "@/components/book-card";
 import { SectionHeading } from "@/components/section-heading";
@@ -140,8 +141,15 @@ export default async function HomePage() {
               className="glass-panel rounded-[2rem] p-6"
             >
               <div className="flex items-center gap-4">
-                <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-slate-950 text-lg font-semibold text-white">
-                  {provider.avatar}
+                <div className="h-16 w-16 overflow-hidden rounded-3xl bg-slate-950">
+                  <Image
+                    src={provider.photo}
+                    alt={provider.name}
+                    width={64}
+                    height={64}
+                    unoptimized
+                    className="h-full w-full object-cover"
+                  />
                 </div>
                 <div>
                   <p className="text-lg font-semibold text-slate-950">{provider.name}</p>

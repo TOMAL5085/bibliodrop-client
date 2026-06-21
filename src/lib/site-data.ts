@@ -101,6 +101,8 @@ export const providers = [
   {
     name: "Ayesha Rahman",
     avatar: "AR",
+    photo:
+      "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=256&h=256&fit=crop",
     completedDeliveries: 482,
     city: "Dhaka",
     specialty: "Fiction",
@@ -108,6 +110,8 @@ export const providers = [
   {
     name: "Nayeem Khan",
     avatar: "NK",
+    photo:
+      "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=256&h=256&fit=crop",
     completedDeliveries: 368,
     city: "Chattogram",
     specialty: "Sci-Fi",
@@ -115,6 +119,8 @@ export const providers = [
   {
     name: "Nusrat Jahan",
     avatar: "NJ",
+    photo:
+      "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=256&h=256&fit=crop",
     completedDeliveries: 354,
     city: "Dhaka",
     specialty: "Academic",
@@ -122,6 +128,8 @@ export const providers = [
   {
     name: "Tanvir Islam",
     avatar: "TI",
+    photo:
+      "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=256&h=256&fit=crop",
     completedDeliveries: 329,
     city: "Sylhet",
     specialty: "Business",
@@ -129,6 +137,8 @@ export const providers = [
   {
     name: "Rafiq Hasan",
     avatar: "RH",
+    photo:
+      "https://images.unsplash.com/photo-1507591064344-4c6ce005b128?w=256&h=256&fit=crop",
     completedDeliveries: 315,
     city: "Rajshahi",
     specialty: "History",
@@ -136,6 +146,8 @@ export const providers = [
   {
     name: "Farida Akter",
     avatar: "FA",
+    photo:
+      "https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?w=256&h=256&fit=crop",
     completedDeliveries: 301,
     city: "Khulna",
     specialty: "Poetry",
