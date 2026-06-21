@@ -100,7 +100,7 @@ const memoryStore = {
     name: "Rafiq Hasan",
     email: "rafiq@example.com",
     role: "librarian" as AuthRole,
-    photoUrl: "https://images.unsplash.com/photo-1508341591423-4347099e1f19?w=256&h=256&fit=crop",
+    photoUrl: "/download.png",
     passwordHash: hashPassword("Password@123"),
   },
   {

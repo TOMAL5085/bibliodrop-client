@@ -139,7 +139,7 @@ export const providers = [
     name: "Rafiq Hasan",
     avatar: "RH",
     photo:
-      "https://images.unsplash.com/photo-1508341591423-4347099e1f19?w=256&h=256&fit=crop",
+      "/download.png",
     completedDeliveries: 315,
     city: "Rajshahi",
     specialty: "History",
@@ -344,7 +344,7 @@ export const books: Book[] = [
     providerRole: "librarian",
     providerAvatar: "RH",
     providerPhoto:
-      "https://images.unsplash.com/photo-1508341591423-4347099e1f19?w=256&h=256&fit=crop",
+      "/download.png",
     addedAt: "2026-05-11",
     coverStart: "#fb923c",
     coverEnd: "#facc15",
@@ -368,7 +368,7 @@ export const books: Book[] = [
     providerRole: "librarian",
     providerAvatar: "RH",
     providerPhoto:
-      "https://images.unsplash.com/photo-1508341591423-4347099e1f19?w=256&h=256&fit=crop",
+      "/download.png",
     addedAt: "2026-05-07",
     coverStart: "#cbd5e1",
     coverEnd: "#475569",
