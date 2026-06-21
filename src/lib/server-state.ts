@@ -85,7 +85,7 @@ export const users: AuthUser[] = [
     name: "Rafiq Hasan",
     email: "rafiq@example.com",
     role: "librarian",
-    photoUrl: "https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=256&h=256&fit=crop",
+    photoUrl: "https://images.unsplash.com/photo-1508341591423-4347099e1f19?w=256&h=256&fit=crop",
     passwordHash: hashPassword("Password@123"),
   },
   {
