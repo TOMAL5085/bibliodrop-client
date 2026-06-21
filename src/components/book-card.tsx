@@ -1,15 +1,19 @@
+import Image from "next/image";
 import Link from "next/link";
 import { Book } from "@/lib/site-data";
 
 export function BookCard({ book }: { book: Book }) {
   return (
     <article className="group h-full overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-[0_20px_60px_-30px_rgba(15,23,42,0.3)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_24px_80px_-24px_rgba(15,23,42,0.35)]">
-      <div
-        className="relative h-52 overflow-hidden"
-        style={{
-          background: `linear-gradient(140deg, ${book.coverStart}, ${book.coverEnd})`,
-        }}
-      >
+      <div className="relative h-52 overflow-hidden">
+        <Image src={book.coverImage} alt={book.title} fill unoptimized className="object-cover" />
+        <div
+          className="absolute inset-0"
+          style={{
+            background: `linear-gradient(140deg, ${book.coverStart}, ${book.coverEnd})`,
+            opacity: 0.34,
+          }}
+        />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_rgba(255,255,255,0.28),_transparent_42%),radial-gradient(circle_at_left_bottom,_rgba(255,255,255,0.14),_transparent_36%)]" />
         <div className="absolute left-5 top-5 rounded-full bg-white/20 px-3 py-1 text-xs font-semibold uppercase tracking-[0.28em] text-white backdrop-blur">
           {book.category}

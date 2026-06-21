@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowRight, BadgeCheck, BookMarked, Lock, Star, Truck } from "lucide-react";
@@ -50,8 +51,12 @@ export default async function BookDetailsPage({
       <div className="grid gap-8 lg:grid-cols-[0.95fr_1.05fr]">
         <div
           className="relative overflow-hidden rounded-[2.5rem] p-6 text-white shadow-[0_30px_90px_-35px_rgba(15,23,42,0.5)]"
-          style={{ background: `linear-gradient(150deg, ${book.coverStart}, ${book.coverEnd})` }}
         >
+          <Image src={book.coverImage} alt={book.title} fill unoptimized className="object-cover" />
+          <div
+            className="absolute inset-0"
+            style={{ background: `linear-gradient(150deg, ${book.coverStart}, ${book.coverEnd})`, opacity: 0.4 }}
+          />
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_rgba(255,255,255,0.22),_transparent_45%),radial-gradient(circle_at_left_bottom,_rgba(255,255,255,0.14),_transparent_40%)]" />
           <div className="relative space-y-5">
             <div className="flex items-center justify-between">
