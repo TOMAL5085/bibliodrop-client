@@ -130,7 +130,7 @@ export const providers = [
     name: "Tanvir Islam",
     avatar: "TI",
     photo:
-      "https://images.unsplash.com/photo-1507591064344-4c6ce005b128?w=256&h=256&fit=crop",
+      "https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=256&h=256&fit=crop",
     completedDeliveries: 329,
     city: "Sylhet",
     specialty: "Business",
@@ -139,7 +139,7 @@ export const providers = [
     name: "Rafiq Hasan",
     avatar: "RH",
     photo:
-      "https://images.unsplash.com/photo-1507591064344-4c6ce005b128?w=256&h=256&fit=crop",
+      "https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=256&h=256&fit=crop",
     completedDeliveries: 315,
     city: "Rajshahi",
     specialty: "History",
@@ -296,7 +296,7 @@ export const books: Book[] = [
     providerRole: "librarian",
     providerAvatar: "TI",
     providerPhoto:
-      "https://images.unsplash.com/photo-1507591064344-4c6ce005b128?w=256&h=256&fit=crop",
+      "https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=256&h=256&fit=crop",
     addedAt: "2026-06-05",
     coverStart: "#d6d3d1",
     coverEnd: "#0f172a",
@@ -320,7 +320,7 @@ export const books: Book[] = [
     providerRole: "librarian",
     providerAvatar: "TI",
     providerPhoto:
-      "https://images.unsplash.com/photo-1507591064344-4c6ce005b128?w=256&h=256&fit=crop",
+      "https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=256&h=256&fit=crop",
     addedAt: "2026-05-20",
     coverStart: "#f59e0b",
     coverEnd: "#1e293b",
@@ -344,7 +344,7 @@ export const books: Book[] = [
     providerRole: "librarian",
     providerAvatar: "RH",
     providerPhoto:
-      "https://images.unsplash.com/photo-1507591064344-4c6ce005b128?w=256&h=256&fit=crop",
+      "https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=256&h=256&fit=crop",
     addedAt: "2026-05-11",
     coverStart: "#fb923c",
     coverEnd: "#facc15",
@@ -368,7 +368,7 @@ export const books: Book[] = [
     providerRole: "librarian",
     providerAvatar: "RH",
     providerPhoto:
-      "https://images.unsplash.com/photo-1507591064344-4c6ce005b128?w=256&h=256&fit=crop",
+      "https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=256&h=256&fit=crop",
     addedAt: "2026-05-07",
     coverStart: "#cbd5e1",
     coverEnd: "#475569",
