@@ -69,7 +69,7 @@ export const users: AuthUser[] = [
     name: "Nusrat Jahan",
     email: "nusrat@example.com",
     role: "librarian",
-    photoUrl: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=256&h=256&fit=crop",
+    photoUrl: "https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?w=256&h=256&fit=crop",
     passwordHash: hashPassword("Password@123"),
   },
   {
@@ -85,7 +85,7 @@ export const users: AuthUser[] = [
     name: "Rafiq Hasan",
     email: "rafiq@example.com",
     role: "librarian",
-    photoUrl: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=256&h=256&fit=crop",
+    photoUrl: "https://images.unsplash.com/photo-1507591064344-4c6ce005b128?w=256&h=256&fit=crop",
     passwordHash: hashPassword("Password@123"),
   },
   {
@@ -93,7 +93,7 @@ export const users: AuthUser[] = [
     name: "Farida Akter",
     email: "farida@example.com",
     role: "librarian",
-    photoUrl: "https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?w=256&h=256&fit=crop",
+    photoUrl: "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=256&h=256&fit=crop",
     passwordHash: hashPassword("Password@123"),
   },
   {

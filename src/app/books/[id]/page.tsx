@@ -68,7 +68,28 @@ export default async function BookDetailsPage({
               </span>
             </div>
             <div className="mt-10 rounded-[2.25rem] border border-white/20 bg-white/10 p-8 backdrop-blur">
-              <p className="text-sm uppercase tracking-[0.35em] text-white/75">{book.provider}</p>
+              <div className="flex items-center gap-3">
+                <div className="h-12 w-12 overflow-hidden rounded-full border border-white/30 bg-white/15">
+                  {book.providerPhoto ? (
+                    <Image
+                      src={book.providerPhoto}
+                      alt={`${book.provider} profile`}
+                      width={48}
+                      height={48}
+                      unoptimized
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    <div className="flex h-full w-full items-center justify-center text-sm font-semibold text-white">
+                      {book.providerAvatar}
+                    </div>
+                  )}
+                </div>
+                <div>
+                  <p className="text-sm uppercase tracking-[0.35em] text-white/75">{book.provider}</p>
+                  <p className="text-xs uppercase tracking-[0.3em] text-white/60">Librarian</p>
+                </div>
+              </div>
               <h1 className="mt-4 max-w-xl text-4xl font-semibold tracking-tight md:text-6xl">
                 {book.title}
               </h1>

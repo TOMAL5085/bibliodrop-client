@@ -18,6 +18,7 @@ type ApiBook = {
   status: string;
   availability: string;
   provider: string;
+  providerPhoto?: string;
   providerEmail?: string;
   coverStart?: string;
   coverEnd?: string;
@@ -121,6 +122,7 @@ function normalizeApiBook(book: ApiBook) {
     provider: book.provider,
     providerRole: localFallback?.providerRole ?? "book owner",
     providerAvatar: localFallback?.providerAvatar ?? "BD",
+    providerPhoto: book.providerPhoto ?? localFallback?.providerPhoto ?? "",
     coverImage: book.coverImage ?? localFallback?.coverImage ?? "",
     coverStart: book.coverStart ?? localFallback?.coverStart ?? "#0f172a",
     coverEnd: book.coverEnd ?? localFallback?.coverEnd ?? "#334155",

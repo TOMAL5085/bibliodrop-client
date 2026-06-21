@@ -15,6 +15,7 @@ export type Book = {
   providerEmail?: string;
   providerRole: "librarian" | "book owner";
   providerAvatar: string;
+  providerPhoto: string;
   coverStart: string;
   coverEnd: string;
   addedAt: string;
@@ -111,7 +112,7 @@ export const providers = [
     name: "Nayeem Khan",
     avatar: "NK",
     photo:
-      "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=256&h=256&fit=crop",
+      "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=256&h=256&fit=crop",
     completedDeliveries: 368,
     city: "Chattogram",
     specialty: "Sci-Fi",
@@ -120,7 +121,7 @@ export const providers = [
     name: "Nusrat Jahan",
     avatar: "NJ",
     photo:
-      "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=256&h=256&fit=crop",
+      "https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?w=256&h=256&fit=crop",
     completedDeliveries: 354,
     city: "Dhaka",
     specialty: "Academic",
@@ -129,7 +130,7 @@ export const providers = [
     name: "Tanvir Islam",
     avatar: "TI",
     photo:
-      "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=256&h=256&fit=crop",
+      "https://images.unsplash.com/photo-1507591064344-4c6ce005b128?w=256&h=256&fit=crop",
     completedDeliveries: 329,
     city: "Sylhet",
     specialty: "Business",
@@ -147,7 +148,7 @@ export const providers = [
     name: "Farida Akter",
     avatar: "FA",
     photo:
-      "https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?w=256&h=256&fit=crop",
+      "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=256&h=256&fit=crop",
     completedDeliveries: 301,
     city: "Khulna",
     specialty: "Poetry",
@@ -170,6 +171,8 @@ export const books: Book[] = [
     providerEmail: "ayesha@example.com",
     providerRole: "librarian",
     providerAvatar: "AR",
+    providerPhoto:
+      "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=256&h=256&fit=crop",
     coverStart: "#f59e0b",
     coverEnd: "#ef4444",
     addedAt: "2026-05-29",
@@ -193,6 +196,8 @@ export const books: Book[] = [
     providerEmail: "ayesha@example.com",
     providerRole: "librarian",
     providerAvatar: "AR",
+    providerPhoto:
+      "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=256&h=256&fit=crop",
     coverStart: "#fb7185",
     coverEnd: "#f59e0b",
     addedAt: "2026-06-02",
@@ -216,6 +221,8 @@ export const books: Book[] = [
     providerEmail: "nayeem@example.com",
     providerRole: "librarian",
     providerAvatar: "NK",
+    providerPhoto:
+      "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=256&h=256&fit=crop",
     addedAt: "2026-06-02",
     coverStart: "#38bdf8",
     coverEnd: "#8b5cf6",
@@ -239,6 +246,8 @@ export const books: Book[] = [
     providerEmail: "nusrat@example.com",
     providerRole: "librarian",
     providerAvatar: "NJ",
+    providerPhoto:
+      "https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?w=256&h=256&fit=crop",
     addedAt: "2026-05-18",
     coverStart: "#10b981",
     coverEnd: "#14b8a6",
@@ -262,6 +271,8 @@ export const books: Book[] = [
     providerEmail: "nusrat@example.com",
     providerRole: "librarian",
     providerAvatar: "NJ",
+    providerPhoto:
+      "https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?w=256&h=256&fit=crop",
     addedAt: "2026-05-20",
     coverStart: "#64748b",
     coverEnd: "#0f172a",
@@ -284,6 +295,8 @@ export const books: Book[] = [
     providerEmail: "tanvir@example.com",
     providerRole: "librarian",
     providerAvatar: "TI",
+    providerPhoto:
+      "https://images.unsplash.com/photo-1507591064344-4c6ce005b128?w=256&h=256&fit=crop",
     addedAt: "2026-06-05",
     coverStart: "#d6d3d1",
     coverEnd: "#0f172a",
@@ -306,6 +319,8 @@ export const books: Book[] = [
     providerEmail: "tanvir@example.com",
     providerRole: "librarian",
     providerAvatar: "TI",
+    providerPhoto:
+      "https://images.unsplash.com/photo-1507591064344-4c6ce005b128?w=256&h=256&fit=crop",
     addedAt: "2026-05-20",
     coverStart: "#f59e0b",
     coverEnd: "#1e293b",
@@ -328,6 +343,8 @@ export const books: Book[] = [
     providerEmail: "rafiq@example.com",
     providerRole: "librarian",
     providerAvatar: "RH",
+    providerPhoto:
+      "https://images.unsplash.com/photo-1507591064344-4c6ce005b128?w=256&h=256&fit=crop",
     addedAt: "2026-05-11",
     coverStart: "#fb923c",
     coverEnd: "#facc15",
@@ -350,6 +367,8 @@ export const books: Book[] = [
     providerEmail: "rafiq@example.com",
     providerRole: "librarian",
     providerAvatar: "RH",
+    providerPhoto:
+      "https://images.unsplash.com/photo-1507591064344-4c6ce005b128?w=256&h=256&fit=crop",
     addedAt: "2026-05-07",
     coverStart: "#cbd5e1",
     coverEnd: "#475569",
@@ -372,6 +391,8 @@ export const books: Book[] = [
     providerEmail: "farida@example.com",
     providerRole: "librarian",
     providerAvatar: "FA",
+    providerPhoto:
+      "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=256&h=256&fit=crop",
     addedAt: "2026-06-03",
     coverStart: "#f9a8d4",
     coverEnd: "#fb7185",
@@ -394,6 +415,8 @@ export const books: Book[] = [
     providerEmail: "farida@example.com",
     providerRole: "librarian",
     providerAvatar: "FA",
+    providerPhoto:
+      "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=256&h=256&fit=crop",
     addedAt: "2026-06-18",
     coverStart: "#fde68a",
     coverEnd: "#fb7185",
@@ -416,6 +439,8 @@ export const books: Book[] = [
     providerEmail: "nayeem@example.com",
     providerRole: "librarian",
     providerAvatar: "NK",
+    providerPhoto:
+      "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=256&h=256&fit=crop",
     addedAt: "2026-06-18",
     coverStart: "#60a5fa",
     coverEnd: "#7c3aed",

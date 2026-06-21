@@ -37,8 +37,21 @@ export function BookCard({ book }: { book: Book }) {
         </p>
         <div className="mt-5 flex items-center justify-between gap-3">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-950 text-sm font-semibold text-white">
-              {book.providerAvatar}
+            <div className="h-10 w-10 overflow-hidden rounded-full bg-slate-950">
+              {book.providerPhoto ? (
+                <Image
+                  src={book.providerPhoto}
+                  alt={`${book.provider} profile`}
+                  width={40}
+                  height={40}
+                  unoptimized
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                <div className="flex h-full w-full items-center justify-center text-sm font-semibold text-white">
+                  {book.providerAvatar}
+                </div>
+              )}
             </div>
             <div className="text-xs text-slate-500">
               <p className="font-medium text-slate-950">{book.rating.toFixed(1)} rating</p>
