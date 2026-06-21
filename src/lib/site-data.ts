@@ -159,7 +159,7 @@ export const books: Book[] = [
   {
     id: "moonlit-postcards",
     title: "Moonlit Postcards",
-    author: "Mina Hossain",
+    author: "Ayesha Rahman",
     category: "Fiction",
     description:
       "A tender city novel about memory, migration, and the way letters keep a neighborhood connected after dark.",
@@ -184,7 +184,7 @@ export const books: Book[] = [
   {
     id: "harbor-of-echoes",
     title: "Harbor of Echoes",
-    author: "Farhan Noor",
+    author: "Ayesha Rahman",
     category: "Fiction",
     description:
       "An intimate story of families, ferries, and the little stories that move between harbor towns and city apartments.",
@@ -209,7 +209,7 @@ export const books: Book[] = [
   {
     id: "signal-after-dawn",
     title: "Signal After Dawn",
-    author: "Farhan Noor",
+    author: "Rafiq Hasan",
     category: "Sci-Fi",
     description:
       "A near-future mystery where a public library and a dormant satellite start exchanging impossible messages.",
@@ -427,7 +427,7 @@ export const books: Book[] = [
   {
     id: "orbit-classroom",
     title: "Orbit Classroom",
-    author: "Shadman Karim",
+    author: "Rafiq Hasan",
     category: "Sci-Fi",
     description:
       "A bright future-school adventure about a classroom in orbit where lessons, algorithms, and courage intersect.",
