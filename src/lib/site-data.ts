@@ -130,7 +130,7 @@ export const providers = [
     name: "Tanvir Islam",
     avatar: "TI",
     photo:
-      "https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=256&h=256&fit=crop",
+      "https://images.unsplash.com/photo-1504593811423-6dd665756598?w=256&h=256&fit=crop",
     completedDeliveries: 329,
     city: "Sylhet",
     specialty: "Business",
@@ -296,7 +296,7 @@ export const books: Book[] = [
     providerRole: "librarian",
     providerAvatar: "TI",
     providerPhoto:
-      "https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=256&h=256&fit=crop",
+      "https://images.unsplash.com/photo-1504593811423-6dd665756598?w=256&h=256&fit=crop",
     addedAt: "2026-06-05",
     coverStart: "#d6d3d1",
     coverEnd: "#0f172a",
@@ -320,7 +320,7 @@ export const books: Book[] = [
     providerRole: "librarian",
     providerAvatar: "TI",
     providerPhoto:
-      "https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=256&h=256&fit=crop",
+      "https://images.unsplash.com/photo-1504593811423-6dd665756598?w=256&h=256&fit=crop",
     addedAt: "2026-05-20",
     coverStart: "#f59e0b",
     coverEnd: "#1e293b",
