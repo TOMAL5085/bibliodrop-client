@@ -109,13 +109,13 @@ export const providers = [
     specialty: "Fiction",
   },
   {
-    name: "Nayeem Khan",
-    avatar: "NK",
+    name: "Rafiq Hasan",
+    avatar: "RH",
     photo:
-      "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=256&h=256&fit=crop",
-    completedDeliveries: 368,
-    city: "Chattogram",
-    specialty: "History",
+      "/download.png",
+    completedDeliveries: 315,
+    city: "Rajshahi",
+    specialty: "Sci-Fi",
   },
   {
     name: "Nusrat Jahan",
@@ -136,13 +136,13 @@ export const providers = [
     specialty: "Business",
   },
   {
-    name: "Rafiq Hasan",
-    avatar: "RH",
+    name: "Nayeem Khan",
+    avatar: "NK",
     photo:
-      "/download.png",
-    completedDeliveries: 315,
-    city: "Rajshahi",
-    specialty: "Sci-Fi",
+      "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=256&h=256&fit=crop",
+    completedDeliveries: 368,
+    city: "Chattogram",
+    specialty: "History",
   },
   {
     name: "Farida Akter",
