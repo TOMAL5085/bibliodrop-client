@@ -14,7 +14,6 @@ export default function RegisterPage() {
   const [googleLoading, setGoogleLoading] = useState(false);
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const [photoUrl, setPhotoUrl] = useState("");
-  const [uploadedFileName, setUploadedFileName] = useState("");
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -77,7 +76,6 @@ export default function RegisterPage() {
       }
 
       setPhotoUrl(url);
-      setUploadedFileName(file.name);
       toast.success("Profile image uploaded.");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Image upload failed.");
@@ -114,18 +112,6 @@ export default function RegisterPage() {
         <h1 className="mt-4 max-w-lg text-4xl font-semibold tracking-tight text-slate-950 md:text-6xl">
           Register as a reader or a librarian.
         </h1>
-        <p className="mt-5 max-w-xl text-sm leading-7 text-slate-600">
-          The form now talks directly to the Vercel-hosted API, supports Google sign-in, supports
-          profile image uploads, and stores the role in MongoDB for dashboard routing.
-        </p>
-
-        <div className="mt-8 rounded-[2rem] border border-slate-200 bg-white p-5">
-          <p className="text-sm font-semibold text-slate-950">Submission defaults</p>
-          <p className="mt-2 text-sm leading-7 text-slate-600">
-            Successful registration signs the user in and sends them to the dashboard, where the
-            saved role routes them to the correct view.
-          </p>
-        </div>
       </div>
 
       <div className="glass-panel rounded-[2.5rem] p-8">
@@ -200,20 +186,9 @@ export default function RegisterPage() {
             </div>
           </div>
 
-          <div className="grid gap-5 sm:grid-cols-[1fr_auto]">
-            <div>
-              <p className="text-sm font-medium text-slate-700">Profile image</p>
-              <div className="mt-2 rounded-2xl border border-slate-200 bg-white px-4 py-3">
-                {uploadedFileName ? (
-                  <p className="text-sm text-slate-600">Uploaded: {uploadedFileName}</p>
-                ) : (
-                  <p className="text-sm text-slate-500">
-                    Upload a profile image to use for your account.
-                  </p>
-                )}
-              </div>
-            </div>
-            <label className="flex cursor-pointer items-center justify-center rounded-2xl border border-dashed border-slate-300 px-5 py-3 text-sm font-semibold text-slate-700">
+          <div>
+            <p className="text-sm font-medium text-slate-700">Profile image</p>
+            <label className="mt-2 flex w-full cursor-pointer items-center justify-center rounded-2xl border border-dashed border-slate-300 px-5 py-3 text-sm font-semibold text-slate-700 sm:w-auto">
               {uploadingPhoto ? "Uploading..." : "Upload image"}
               <input type="file" accept="image/*" className="hidden" onChange={handlePhotoUpload} />
             </label>
