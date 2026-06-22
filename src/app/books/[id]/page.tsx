@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { ArrowRight, BadgeCheck, BookMarked, Lock, Star, Truck } from "lucide-react";
 import { BookCard } from "@/components/book-card";
 import { SectionHeading } from "@/components/section-heading";
+import { ReviewPager } from "@/components/review-pager";
 import { getBookDetailsFromApi } from "@/lib/api";
 import { getBookById } from "@/lib/site-data";
 
@@ -172,36 +173,8 @@ export default async function BookDetailsPage({
           title="Verified reviews from delivered orders."
           description="Only readers with a delivered record for this specific book are allowed to post feedback."
         />
-        <div className="mt-8 grid gap-4">
-          {reviews.length ? (
-            reviews.map((review) => (
-              <div
-                key={review.id}
-                className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-[0_14px_40px_-28px_rgba(15,23,42,0.26)]"
-              >
-                <div className="flex flex-wrap items-center justify-between gap-3">
-                  <div>
-                    <p className="font-semibold text-slate-950">{review.user}</p>
-                    <p className="text-sm text-slate-500">{review.date}</p>
-                  </div>
-                  <div className="flex items-center gap-2 rounded-full bg-emerald-100 px-3 py-1 text-sm font-semibold text-emerald-700">
-                    <BadgeCheck className="h-4 w-4" />
-                    Verified
-                  </div>
-                </div>
-                <div className="mt-4 flex items-center gap-1 text-amber-500">
-                  {Array.from({ length: review.rating }).map((_, index) => (
-                    <Star key={index} className="h-4 w-4 fill-current" />
-                  ))}
-                </div>
-                <p className="mt-4 max-w-4xl text-sm leading-7 text-slate-600">{review.comment}</p>
-              </div>
-            ))
-          ) : (
-            <div className="rounded-[2rem] border border-dashed border-slate-300 bg-white p-8 text-sm text-slate-600">
-              No reviews yet. This title is ready for the first delivered reader review.
-            </div>
-          )}
+        <div className="mt-8">
+          <ReviewPager reviews={reviews} />
         </div>
       </div>
 
