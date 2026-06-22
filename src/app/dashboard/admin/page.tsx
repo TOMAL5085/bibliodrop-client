@@ -28,11 +28,14 @@ const categoryPie = Object.entries(categoryCounts).map(([name, value]) => ({
 }));
 
 const revenueTrend = monthLabels.map((name, monthIndex) => {
-  const monthBooks = books.filter((book) => getMonthIndex(book.addedAt) === monthIndex);
+  const monthTransactions = transactions.filter(
+    (transaction) => getMonthIndex(transaction.date) === monthIndex
+  );
+
   return {
     name,
-    books: monthBooks.length,
-    revenue: monthBooks.reduce((sum, book) => sum + book.deliveryFee, 0),
+    books: monthTransactions.length,
+    revenue: monthTransactions.reduce((sum, transaction) => sum + transaction.amount, 0),
   };
 });
 
@@ -71,6 +74,9 @@ export default function AdminDashboardPage() {
       <div className="grid gap-6 lg:grid-cols-[1.05fr_0.95fr]">
         <div className="glass-panel rounded-[2rem] p-6">
           <h2 className="text-xl font-semibold text-slate-950">Revenue trend</h2>
+          <p className="mt-2 text-sm text-slate-500">
+            This chart now follows the transaction records, so it matches the total revenue card.
+          </p>
           <div className="mt-6">
             <RevenueChart data={revenueTrend} />
           </div>
