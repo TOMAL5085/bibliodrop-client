@@ -163,23 +163,6 @@ export default async function BookDetailsPage({
             ) : null}
           </div>
 
-          <div className="glass-panel rounded-[2rem] p-6">
-            <p className="text-sm uppercase tracking-[0.3em] text-slate-500">Librarian controls</p>
-            <div className="mt-4 flex flex-wrap gap-3">
-              <span className="rounded-full bg-slate-950 px-4 py-2 text-sm font-semibold text-white">
-                Edit
-              </span>
-              <span className="rounded-full border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700">
-                Delete
-              </span>
-              <span className="rounded-full border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700">
-                Unpublish
-              </span>
-            </div>
-            <p className="mt-4 text-sm leading-7 text-slate-600">
-              In the production app, these buttons belong to the owning librarian only.
-            </p>
-          </div>
         </div>
       </div>
 

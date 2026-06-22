@@ -1,5 +1,6 @@
 import { ActivityBarChart } from "@/components/charts";
 import { SectionHeading } from "@/components/section-heading";
+import Link from "next/link";
 import { chartData, dashboardMetrics, deliveryHistory, books } from "@/lib/site-data";
 
 export default function LibrarianDashboardPage() {
@@ -64,6 +65,7 @@ export default function LibrarianDashboardPage() {
                   <th className="px-4 py-3">Book</th>
                   <th className="px-4 py-3">Status</th>
                   <th className="px-4 py-3">Fee</th>
+                  <th className="px-4 py-3">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -75,11 +77,31 @@ export default function LibrarianDashboardPage() {
                     </td>
                     <td className="px-4 py-4 text-slate-600">{book.status}</td>
                     <td className="px-4 py-4 text-slate-600">BDT {book.deliveryFee}</td>
+                    <td className="px-4 py-4">
+                      <div className="flex flex-wrap gap-2">
+                        <Link
+                          href={`/books/${book.id}`}
+                          className="rounded-full bg-slate-950 px-3 py-2 text-xs font-semibold text-white"
+                        >
+                          Edit
+                        </Link>
+                        <button className="rounded-full border border-slate-300 px-3 py-2 text-xs font-semibold text-slate-700">
+                          Delete
+                        </button>
+                        <button className="rounded-full border border-slate-300 px-3 py-2 text-xs font-semibold text-slate-700">
+                          Unpublish
+                        </button>
+                      </div>
+                    </td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
+          <p className="mt-4 text-sm leading-7 text-slate-600">
+            These inventory actions stay inside the librarian dashboard, so public book pages stay
+            clean while new librarian-added books still have edit, delete, and unpublish controls.
+          </p>
         </div>
 
         <div className="glass-panel rounded-[2rem] p-6">
