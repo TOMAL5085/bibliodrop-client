@@ -30,6 +30,7 @@ const rolePathMap: Record<string, string> = {
 export function DashboardShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
+  const isAdminDashboard = pathname.startsWith("/dashboard/admin");
   const [status, setStatus] = useState<"loading" | "authenticated" | "unauthenticated">(
     "loading"
   );
@@ -116,6 +117,9 @@ export function DashboardShell({ children }: { children: ReactNode }) {
   }
 
   const currentUser = user as SessionUser;
+  const visibleDashboardLinks = isAdminDashboard
+    ? dashboardLinks.filter((item) => item.href === "/dashboard/admin")
+    : dashboardLinks;
   return (
     <div className="min-h-screen bg-slate-50">
       <div className="mx-auto flex max-w-7xl flex-col px-4 py-6 sm:px-6 lg:flex-row lg:gap-8 lg:px-8">
@@ -147,7 +151,7 @@ export function DashboardShell({ children }: { children: ReactNode }) {
           </div>
 
           <nav className="mt-6 space-y-2">
-            {dashboardLinks.map((item) => {
+            {visibleDashboardLinks.map((item) => {
               const active = pathname.startsWith(item.href);
               const Icon = item.icon;
               return (
@@ -167,15 +171,17 @@ export function DashboardShell({ children }: { children: ReactNode }) {
             })}
           </nav>
 
-          <div className="mt-6 rounded-[1.5rem] bg-slate-950 p-5 text-white">
-            <p className="text-sm font-semibold uppercase tracking-[0.25em] text-white/70">
-              Session status
-            </p>
-            <p className="mt-3 text-sm leading-7 text-slate-300">
-              Your dashboard now restores the authenticated user on refresh and keeps the role
-              view aligned with the signed-in account.
-            </p>
-          </div>
+          {!isAdminDashboard ? (
+            <div className="mt-6 rounded-[1.5rem] bg-slate-950 p-5 text-white">
+              <p className="text-sm font-semibold uppercase tracking-[0.25em] text-white/70">
+                Session status
+              </p>
+              <p className="mt-3 text-sm leading-7 text-slate-300">
+                Your dashboard now restores the authenticated user on refresh and keeps the role
+                view aligned with the signed-in account.
+              </p>
+            </div>
+          ) : null}
 
           <button
             type="button"
