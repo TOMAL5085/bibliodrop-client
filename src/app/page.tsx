@@ -194,10 +194,11 @@ export default async function HomePage() {
                   alt={category.name}
                   fill
                   unoptimized
+                  quality={100}
                   className="object-cover transition duration-500 group-hover:scale-105"
                 />
-                <div className={`absolute inset-0 bg-gradient-to-br ${category.accent} opacity-35`} />
-                <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(15,23,42,0.02),rgba(15,23,42,0.18))]" />
+                <div className={`absolute inset-0 bg-gradient-to-br ${category.accent} opacity-15`} />
+                <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(15,23,42,0.02),rgba(15,23,42,0.10))]" />
               </div>
               <p className="mt-5 text-xs uppercase tracking-[0.3em] text-slate-500">
                 {category.slug}

@@ -1,0 +1,27 @@
+<svg width="1600" height="900" viewBox="0 0 1600 900" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1600" y2="900" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#7DD3FC"/>
+      <stop offset="0.52" stop-color="#67E8F9"/>
+      <stop offset="1" stop-color="#A78BFA"/>
+    </linearGradient>
+    <radialGradient id="planet" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(930 400) rotate(90) scale(180 260)">
+      <stop stop-color="#DBEAFE"/>
+      <stop offset="1" stop-color="#1E3A8A"/>
+    </radialGradient>
+  </defs>
+  <rect width="1600" height="900" rx="120" fill="url(#bg)"/>
+  <circle cx="1230" cy="180" r="80" fill="white" fill-opacity="0.25"/>
+  <circle cx="270" cy="220" r="56" fill="white" fill-opacity="0.18"/>
+  <circle cx="330" cy="680" r="120" fill="white" fill-opacity="0.12"/>
+  <circle cx="940" cy="430" r="190" fill="url(#planet)"/>
+  <ellipse cx="940" cy="430" rx="330" ry="95" stroke="#FFFFFF" stroke-opacity="0.7" stroke-width="28"/>
+  <ellipse cx="940" cy="430" rx="330" ry="95" stroke="#0EA5E9" stroke-opacity="0.22" stroke-width="10"/>
+  <circle cx="1020" cy="360" r="18" fill="#FFFFFF"/>
+  <circle cx="1130" cy="260" r="10" fill="#FFFFFF" fill-opacity="0.9"/>
+  <circle cx="1170" cy="510" r="12" fill="#FFFFFF" fill-opacity="0.9"/>
+  <circle cx="820" cy="260" r="9" fill="#FFFFFF" fill-opacity="0.85"/>
+  <circle cx="760" cy="560" r="8" fill="#FFFFFF" fill-opacity="0.85"/>
+  <path d="M530 690C600 610 680 580 790 570" stroke="#ffffff" stroke-opacity="0.55" stroke-width="26" stroke-linecap="round"/>
+  <path d="M640 240L668 292L726 300L682 340L694 398L640 370L586 398L598 340L554 300L612 292L640 240Z" fill="#FFFFFF" fill-opacity="0.85"/>
+</svg>
