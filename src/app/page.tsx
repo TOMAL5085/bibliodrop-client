@@ -188,7 +188,17 @@ export default async function HomePage() {
               href={`/browse-books?category=${encodeURIComponent(category.name)}`}
               className="group overflow-hidden rounded-[2rem] border border-slate-200 bg-white p-6 transition hover:-translate-y-1 hover:shadow-[0_24px_60px_-30px_rgba(15,23,42,0.28)]"
             >
-              <div className={`h-40 rounded-[1.5rem] bg-gradient-to-br ${category.accent}`} />
+              <div className="relative h-40 overflow-hidden rounded-[1.5rem] bg-slate-100">
+                <Image
+                  src={category.image}
+                  alt={category.name}
+                  fill
+                  unoptimized
+                  className="object-cover transition duration-500 group-hover:scale-105"
+                />
+                <div className={`absolute inset-0 bg-gradient-to-br ${category.accent} opacity-35`} />
+                <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(15,23,42,0.02),rgba(15,23,42,0.18))]" />
+              </div>
               <p className="mt-5 text-xs uppercase tracking-[0.3em] text-slate-500">
                 {category.slug}
               </p>
