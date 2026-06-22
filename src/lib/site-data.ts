@@ -113,7 +113,7 @@ export const providers = [
     avatar: "RH",
     photo:
       "/download.png",
-    completedDeliveries: 315,
+    completedDeliveries: 368,
     city: "Rajshahi",
     specialty: "Sci-Fi",
   },
@@ -140,7 +140,7 @@ export const providers = [
     avatar: "NK",
     photo:
       "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=256&h=256&fit=crop",
-    completedDeliveries: 368,
+    completedDeliveries: 315,
     city: "Chattogram",
     specialty: "History",
   },
