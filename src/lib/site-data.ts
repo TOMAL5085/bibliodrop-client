@@ -700,7 +700,7 @@ export function getSimilarBooks(book: Book) {
       (item) =>
         item.id !== book.id &&
         item.status === "published" &&
-        (item.category === book.category || item.provider === book.provider)
+        item.author === book.author
     )
     .slice(0, 3);
 }
