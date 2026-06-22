@@ -8,6 +8,7 @@ export type Book = {
   category: string;
   description: string;
   coverImage: string;
+  authorPhoto?: string;
   deliveryFee: number;
   status: BookStatus;
   availability: "Available" | "Checked Out";
@@ -229,6 +230,7 @@ export const books: Book[] = [
     providerAvatar: "NK",
     providerPhoto:
       "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=256&h=256&fit=crop",
+    authorPhoto: "/download.png",
     addedAt: "2026-06-02",
     coverStart: "#38bdf8",
     coverEnd: "#8b5cf6",
@@ -447,6 +449,7 @@ export const books: Book[] = [
     providerAvatar: "NK",
     providerPhoto:
       "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=256&h=256&fit=crop",
+    authorPhoto: "/download.png",
     addedAt: "2026-06-18",
     coverStart: "#60a5fa",
     coverEnd: "#7c3aed",

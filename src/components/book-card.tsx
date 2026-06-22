@@ -38,10 +38,10 @@ export function BookCard({ book }: { book: Book }) {
         <div className="mt-5 flex items-center justify-between gap-3">
           <div className="flex items-center gap-3">
             <div className="h-10 w-10 overflow-hidden rounded-full bg-slate-950">
-              {book.providerPhoto ? (
+              {book.authorPhoto ?? book.providerPhoto ? (
                 <Image
-                  src={book.providerPhoto}
-                  alt={`${book.provider} profile`}
+                  src={book.authorPhoto ?? book.providerPhoto}
+                  alt={`${book.author} profile`}
                   width={40}
                   height={40}
                   unoptimized
