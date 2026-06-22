@@ -180,6 +180,8 @@ export const books: Book[] = [
     providerAvatar: "AR",
     providerPhoto:
       "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=256&h=256&fit=crop",
+    authorPhoto:
+      "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=256&h=256&fit=crop",
     coverStart: "#f59e0b",
     coverEnd: "#ef4444",
     addedAt: "2026-05-29",
@@ -204,6 +206,8 @@ export const books: Book[] = [
     providerRole: "librarian",
     providerAvatar: "AR",
     providerPhoto:
+      "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=256&h=256&fit=crop",
+    authorPhoto:
       "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=256&h=256&fit=crop",
     coverStart: "#fb7185",
     coverEnd: "#f59e0b",
@@ -256,6 +260,8 @@ export const books: Book[] = [
     providerAvatar: "NJ",
     providerPhoto:
       "https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?w=256&h=256&fit=crop",
+    authorPhoto:
+      "https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?w=256&h=256&fit=crop",
     addedAt: "2026-05-18",
     coverStart: "#10b981",
     coverEnd: "#14b8a6",
@@ -281,6 +287,8 @@ export const books: Book[] = [
     providerAvatar: "NJ",
     providerPhoto:
       "https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?w=256&h=256&fit=crop",
+    authorPhoto:
+      "https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?w=256&h=256&fit=crop",
     addedAt: "2026-05-20",
     coverStart: "#64748b",
     coverEnd: "#0f172a",
@@ -304,6 +312,8 @@ export const books: Book[] = [
     providerRole: "librarian",
     providerAvatar: "TI",
     providerPhoto:
+      "https://images.unsplash.com/photo-1504593811423-6dd665756598?w=256&h=256&fit=crop",
+    authorPhoto:
       "https://images.unsplash.com/photo-1504593811423-6dd665756598?w=256&h=256&fit=crop",
     addedAt: "2026-06-05",
     coverStart: "#d6d3d1",
@@ -329,6 +339,8 @@ export const books: Book[] = [
     providerAvatar: "TI",
     providerPhoto:
       "https://images.unsplash.com/photo-1504593811423-6dd665756598?w=256&h=256&fit=crop",
+    authorPhoto:
+      "https://images.unsplash.com/photo-1504593811423-6dd665756598?w=256&h=256&fit=crop",
     addedAt: "2026-05-20",
     coverStart: "#f59e0b",
     coverEnd: "#1e293b",
@@ -352,6 +364,8 @@ export const books: Book[] = [
     providerRole: "librarian",
     providerAvatar: "NK",
     providerPhoto:
+      "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=256&h=256&fit=crop",
+    authorPhoto:
       "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=256&h=256&fit=crop",
     addedAt: "2026-05-11",
     coverStart: "#fb923c",
@@ -377,6 +391,8 @@ export const books: Book[] = [
     providerAvatar: "NK",
     providerPhoto:
       "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=256&h=256&fit=crop",
+    authorPhoto:
+      "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=256&h=256&fit=crop",
     addedAt: "2026-05-07",
     coverStart: "#cbd5e1",
     coverEnd: "#475569",
@@ -401,6 +417,8 @@ export const books: Book[] = [
     providerAvatar: "FA",
     providerPhoto:
       "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=256&h=256&fit=crop",
+    authorPhoto:
+      "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=256&h=256&fit=crop",
     addedAt: "2026-06-03",
     coverStart: "#f9a8d4",
     coverEnd: "#fb7185",
@@ -424,6 +442,8 @@ export const books: Book[] = [
     providerRole: "librarian",
     providerAvatar: "FA",
     providerPhoto:
+      "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=256&h=256&fit=crop",
+    authorPhoto:
       "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=256&h=256&fit=crop",
     addedAt: "2026-06-18",
     coverStart: "#fde68a",
