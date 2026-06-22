@@ -6,6 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState, type ReactNode } from "react";
 import { BookOpenText, ChartColumn, LogOut, Package, ShieldCheck, UserCircle2 } from "lucide-react";
 import { getSession, logoutUser } from "@/lib/api";
+import { getStoredAuthSession, subscribeAuthSessionChange } from "@/lib/auth-session";
 
 type SessionUser = {
   id: string;
@@ -31,15 +32,26 @@ export function DashboardShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const isAdminDashboard = pathname.startsWith("/dashboard/admin");
+  const cachedSession = getStoredAuthSession();
   const [status, setStatus] = useState<"loading" | "authenticated" | "unauthenticated">(
-    "loading"
+    cachedSession.user ? "authenticated" : "loading"
   );
-  const [user, setUser] = useState<SessionUser | null>(null);
+  const [user, setUser] = useState<SessionUser | null>(cachedSession.user);
 
   useEffect(() => {
     let active = true;
 
-  async function loadSession() {
+    const syncSessionFromCache = () => {
+      if (!active) {
+        return;
+      }
+
+      const session = getStoredAuthSession();
+      setUser(session.user);
+      setStatus(session.user ? "authenticated" : "loading");
+    };
+
+    async function loadSession() {
       const response = await getSession();
 
       if (!active) {
@@ -47,9 +59,11 @@ export function DashboardShell({ children }: { children: ReactNode }) {
       }
 
       if (!response?.user) {
-        setStatus("unauthenticated");
-        setUser(null);
-        router.replace(`/login?next=${encodeURIComponent(pathname)}`);
+        if (!getStoredAuthSession().user) {
+          setStatus("unauthenticated");
+          setUser(null);
+          router.replace(`/login?next=${encodeURIComponent(pathname)}`);
+        }
         return;
       }
 
@@ -67,10 +81,13 @@ export function DashboardShell({ children }: { children: ReactNode }) {
       }
     }
 
+    const unsubscribe = subscribeAuthSessionChange(syncSessionFromCache);
+    syncSessionFromCache();
     loadSession();
 
     return () => {
       active = false;
+      unsubscribe();
     };
   }, [pathname, router]);
 

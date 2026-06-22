@@ -6,6 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { ChevronDown, Menu, X, LogIn, LogOut, UserCircle2 } from "lucide-react";
 import { getSession, logoutUser } from "@/lib/api";
+import { getStoredAuthSession, subscribeAuthSessionChange } from "@/lib/auth-session";
 
 const navItems = [
   { href: "/", label: "Home" },
@@ -17,8 +18,9 @@ export function SiteHeader() {
   const router = useRouter();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
-  const [status, setStatus] = useState<"loading" | "authenticated" | "unauthenticated">(
-    "loading"
+  const cachedSession = getStoredAuthSession();
+  const [status, setStatus] = useState<"authenticated" | "unauthenticated">(
+    cachedSession.user ? "authenticated" : "unauthenticated"
   );
   const [user, setUser] = useState<{
     id: string;
@@ -26,10 +28,20 @@ export function SiteHeader() {
     email: string;
     role: string;
     photoUrl?: string;
-  } | null>(null);
+  } | null>(cachedSession.user);
 
   useEffect(() => {
     let active = true;
+
+    const syncSessionFromCache = () => {
+      if (!active) {
+        return;
+      }
+
+      const session = getStoredAuthSession();
+      setUser(session.user);
+      setStatus(session.user ? "authenticated" : "unauthenticated");
+    };
 
     async function loadSession() {
       const response = await getSession();
@@ -39,8 +51,10 @@ export function SiteHeader() {
       }
 
       if (!response?.user) {
-        setUser(null);
-        setStatus("unauthenticated");
+        if (!getStoredAuthSession().user) {
+          setUser(null);
+          setStatus("unauthenticated");
+        }
         return;
       }
 
@@ -48,10 +62,13 @@ export function SiteHeader() {
       setStatus("authenticated");
     }
 
+    const unsubscribe = subscribeAuthSessionChange(syncSessionFromCache);
+    syncSessionFromCache();
     loadSession();
 
     return () => {
       active = false;
+      unsubscribe();
     };
   }, []);
 
@@ -62,7 +79,6 @@ export function SiteHeader() {
     setAccountOpen(false);
     setMobileOpen(false);
     router.push("/");
-    router.refresh();
   }
 
   return (
@@ -175,8 +191,6 @@ export function SiteHeader() {
                 </button>
               </div>
             </div>
-          ) : status === "loading" ? (
-            <div className="h-10 w-40 animate-pulse rounded-full bg-slate-100" />
           ) : (
             <>
               <Link
@@ -282,8 +296,6 @@ export function SiteHeader() {
                   </div>
                 ) : null}
               </div>
-            ) : status === "loading" ? (
-              <div className="mt-2 h-12 rounded-full bg-slate-100" />
             ) : (
               <div className="grid grid-cols-2 gap-3 pt-2">
                 <Link
