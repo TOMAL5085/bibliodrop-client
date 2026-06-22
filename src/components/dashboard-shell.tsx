@@ -6,7 +6,6 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState, type ReactNode } from "react";
 import { BookOpenText, ChartColumn, LogOut, Package, ShieldCheck, UserCircle2 } from "lucide-react";
 import { getSession, logoutUser } from "@/lib/api";
-import { getStoredAuthSession, subscribeAuthSessionChange } from "@/lib/auth-session";
 
 type SessionUser = {
   id: string;
@@ -31,25 +30,13 @@ const rolePathMap: Record<string, string> = {
 export function DashboardShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
-  const isAdminDashboard = pathname.startsWith("/dashboard/admin");
-  const cachedSession = getStoredAuthSession();
   const [status, setStatus] = useState<"loading" | "authenticated" | "unauthenticated">(
-    cachedSession.user ? "authenticated" : "loading"
+    "loading"
   );
-  const [user, setUser] = useState<SessionUser | null>(cachedSession.user);
+  const [user, setUser] = useState<SessionUser | null>(null);
 
   useEffect(() => {
     let active = true;
-
-    const syncSessionFromCache = () => {
-      if (!active) {
-        return;
-      }
-
-      const session = getStoredAuthSession();
-      setUser(session.user);
-      setStatus(session.user ? "authenticated" : "loading");
-    };
 
     async function loadSession() {
       const response = await getSession();
@@ -59,11 +46,9 @@ export function DashboardShell({ children }: { children: ReactNode }) {
       }
 
       if (!response?.user) {
-        if (!getStoredAuthSession().user) {
-          setStatus("unauthenticated");
-          setUser(null);
-          router.replace(`/login?next=${encodeURIComponent(pathname)}`);
-        }
+        setStatus("unauthenticated");
+        setUser(null);
+        router.replace(`/login?next=${encodeURIComponent(pathname)}`);
         return;
       }
 
@@ -81,13 +66,10 @@ export function DashboardShell({ children }: { children: ReactNode }) {
       }
     }
 
-    const unsubscribe = subscribeAuthSessionChange(syncSessionFromCache);
-    syncSessionFromCache();
     loadSession();
 
     return () => {
       active = false;
-      unsubscribe();
     };
   }, [pathname, router]);
 
@@ -134,9 +116,6 @@ export function DashboardShell({ children }: { children: ReactNode }) {
   }
 
   const currentUser = user as SessionUser;
-  const visibleDashboardLinks = isAdminDashboard
-    ? dashboardLinks.filter((item) => item.href === "/dashboard/admin")
-    : dashboardLinks;
   return (
     <div className="min-h-screen bg-slate-50">
       <div className="mx-auto flex max-w-7xl flex-col px-4 py-6 sm:px-6 lg:flex-row lg:gap-8 lg:px-8">
@@ -168,7 +147,7 @@ export function DashboardShell({ children }: { children: ReactNode }) {
           </div>
 
           <nav className="mt-6 space-y-2">
-            {visibleDashboardLinks.map((item) => {
+            {dashboardLinks.map((item) => {
               const active = pathname.startsWith(item.href);
               const Icon = item.icon;
               return (
@@ -188,17 +167,15 @@ export function DashboardShell({ children }: { children: ReactNode }) {
             })}
           </nav>
 
-          {!isAdminDashboard ? (
-            <div className="mt-6 rounded-[1.5rem] bg-slate-950 p-5 text-white">
-              <p className="text-sm font-semibold uppercase tracking-[0.25em] text-white/70">
-                Session status
-              </p>
-              <p className="mt-3 text-sm leading-7 text-slate-300">
-                Your dashboard now restores the authenticated user on refresh and keeps the role
-                view aligned with the signed-in account.
-              </p>
-            </div>
-          ) : null}
+          <div className="mt-6 rounded-[1.5rem] bg-slate-950 p-5 text-white">
+            <p className="text-sm font-semibold uppercase tracking-[0.25em] text-white/70">
+              Session status
+            </p>
+            <p className="mt-3 text-sm leading-7 text-slate-300">
+              Your dashboard now restores the authenticated user on refresh and keeps the role
+              view aligned with the signed-in account.
+            </p>
+          </div>
 
           <button
             type="button"

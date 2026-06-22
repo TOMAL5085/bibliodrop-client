@@ -7,11 +7,6 @@ import {
   getSimilarBooks,
 } from "@/lib/site-data";
 import { normalizeUser, type AppRole } from "@/lib/auth-user";
-import {
-  clearStoredAuthSession,
-  getStoredAuthToken as readStoredAuthToken,
-  setStoredAuthSession,
-} from "@/lib/auth-session";
 
 type ApiBook = {
   id: string;
@@ -41,8 +36,27 @@ const apiBaseUrl =
     ? `https://${process.env.VERCEL_URL}`
     : "");
 
+const authTokenKey = "bibliodrop_auth_token";
+
 function getStoredAuthToken() {
-  return readStoredAuthToken();
+  if (typeof window === "undefined") {
+    return null;
+  }
+
+  return window.localStorage.getItem(authTokenKey);
+}
+
+function storeAuthToken(token: string | null | undefined) {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  if (!token) {
+    window.localStorage.removeItem(authTokenKey);
+    return;
+  }
+
+  window.localStorage.setItem(authTokenKey, token);
 }
 
 function resolveApiUrl(path: string) {
@@ -229,7 +243,7 @@ export async function loginUser(payload: { email: string; password: string }) {
     return null;
   }
 
-  setStoredAuthSession({ user: toAppUser(response.user), token: response.token });
+  storeAuthToken(response.token);
 
   return {
     user: toAppUser(response.user),
@@ -266,7 +280,7 @@ export async function registerUser(payload: {
     return null;
   }
 
-  setStoredAuthSession({ user: toAppUser(response.user), token: response.token });
+  storeAuthToken(response.token);
 
   return {
     user: toAppUser(response.user),
@@ -294,7 +308,7 @@ export async function startGoogleSignIn(callbackURL: string) {
 }
 
 export async function logoutUser() {
-  clearStoredAuthSession();
+  storeAuthToken(null);
 
   await fetchJson<{ ok: boolean }>("/api/auth/logout", {
     method: "POST",
@@ -310,11 +324,8 @@ export async function getSession() {
     return null;
   }
 
-  const user = toAppUser(response.user);
-  setStoredAuthSession({ user, token: getStoredAuthToken() });
-
   return {
-    user,
+    user: toAppUser(response.user),
   };
 }
 
