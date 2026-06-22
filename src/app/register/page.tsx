@@ -52,7 +52,7 @@ export default function RegisterPage() {
       }
 
       toast.success("Registration successful. Welcome to BiblioDrop.");
-      router.push("/dashboard");
+      router.push("/");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Registration failed.");
     } finally {
@@ -89,7 +89,7 @@ export default function RegisterPage() {
     setGoogleLoading(true);
 
     try {
-      const callbackURL = `${window.location.origin}/dashboard`;
+      const callbackURL = `${window.location.origin}/`;
       const response = await startGoogleSignIn(callbackURL);
 
       if (!response?.url) {

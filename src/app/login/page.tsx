@@ -37,18 +37,12 @@ export default function LoginPage() {
       toast.success(`Welcome back, ${response.user.name}.`);
 
       const nextPath = searchParams.get("next");
-      if (nextPath?.startsWith("/dashboard")) {
+      if (nextPath) {
         router.push(nextPath);
         return;
       }
 
-      if (response.user.role === "admin") {
-        router.push("/dashboard/admin");
-      } else if (response.user.role === "librarian") {
-        router.push("/dashboard/librarian");
-      } else {
-        router.push("/dashboard/user");
-      }
+      router.push("/");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Login failed.");
     } finally {
@@ -61,7 +55,7 @@ export default function LoginPage() {
 
     try {
       const nextPath = searchParams.get("next");
-      const callbackURL = nextPath?.startsWith("/dashboard") ? nextPath : "/dashboard";
+      const callbackURL = nextPath || "/";
       const response = await startGoogleSignIn(
         `${window.location.origin}${callbackURL.startsWith("/") ? callbackURL : `/${callbackURL}`}`
       );
