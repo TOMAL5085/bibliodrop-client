@@ -1,5 +1,10 @@
 import { NextResponse } from "next/server";
-import { createReview } from "@/lib/persistence";
+import { createReview, listAllReviews } from "@/lib/persistence";
+
+export async function GET() {
+  const data = await listAllReviews();
+  return NextResponse.json({ data });
+}
 
 export async function POST(request: Request) {
   const body = (await request.json().catch(() => null)) as

@@ -1,6 +1,7 @@
 import crypto from "node:crypto";
 import { MongoClient, type Collection } from "mongodb";
 import {
+  type Book,
   books,
   dashboardMetrics,
   getBookById,
@@ -450,4 +451,77 @@ export function getApprovalQueue() {
 
 export function sanitizeUser(user: AuthUser) {
   return toSanitizedUser(user);
+}
+
+export async function listAllReviews() {
+  await seedCollections();
+
+  if (isMongoEnabled()) {
+    const collections = await getCollections();
+    return (await collections?.reviews.find().sort({ date: -1 }).toArray()) ?? [];
+  }
+
+  return [...memoryStore.reviews];
+}
+
+export async function createBook(input: {
+  title: string;
+  author: string;
+  description: string;
+  deliveryFee: number;
+  category: string;
+  coverImage: string;
+  provider: string;
+  providerEmail: string;
+}) {
+  await seedCollections();
+
+  const newBook: Book = {
+    id: `book_${crypto.randomUUID()}`,
+    title: input.title,
+    author: input.author,
+    description: input.description,
+    deliveryFee: input.deliveryFee,
+    category: input.category,
+    coverImage: input.coverImage || "/covers/default.jpg",
+    status: "published",
+    availability: "Available",
+    provider: input.provider,
+    providerEmail: input.providerEmail,
+    providerRole: "librarian",
+    providerAvatar: input.provider.charAt(0),
+    providerPhoto: "",
+    coverStart: "#0f172a",
+    coverEnd: "#334155",
+    addedAt: new Date().toISOString().slice(0, 10),
+    rating: 5,
+    reviews: 0,
+    deliveries: 0,
+    featured: false,
+  };
+
+  books.push(newBook);
+  return newBook;
+}
+
+export async function updateDeliveryStatus(id: string, status: "Pending" | "Dispatched" | "Delivered") {
+  await seedCollections();
+
+  if (isMongoEnabled()) {
+    const collections = await getCollections();
+    const result = await collections?.deliveries.findOneAndUpdate(
+      { id },
+      { $set: { status } },
+      { returnDocument: "after" }
+    );
+    return result ?? null;
+  }
+
+  const delivery = memoryStore.deliveries.find((d) => d.id === id);
+  if (delivery) {
+    delivery.status = status;
+    return delivery;
+  }
+
+  return null;
 }

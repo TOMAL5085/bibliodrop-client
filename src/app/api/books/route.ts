@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getBooksFromApi } from "@/lib/persistence";
+import { getBooksFromApi, createBook } from "@/lib/persistence";
 
 export function GET(request: NextRequest) {
   const filters = {
@@ -11,4 +11,24 @@ export function GET(request: NextRequest) {
   };
 
   return NextResponse.json({ data: getBooksFromApi(filters) });
+}
+
+export async function POST(request: Request) {
+  const body = await request.json().catch(() => null);
+  if (!body?.title || !body?.author || !body?.providerEmail) {
+    return NextResponse.json({ message: "Missing required fields" }, { status: 400 });
+  }
+
+  const book = await createBook({
+    title: body.title,
+    author: body.author,
+    description: body.description ?? "",
+    deliveryFee: Number(body.deliveryFee ?? 0),
+    category: body.category ?? "Fiction",
+    coverImage: body.coverImage ?? "",
+    provider: body.provider ?? "Librarian",
+    providerEmail: body.providerEmail,
+  });
+
+  return NextResponse.json({ data: book }, { status: 201 });
 }
