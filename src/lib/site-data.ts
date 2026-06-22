@@ -456,54 +456,107 @@ export const books: Book[] = [
   },
 ];
 
-export const reviewsByBook: Record<string, Review[]> = {
-  "moonlit-postcards": [
-    {
-      id: "r1",
-      user: "Nusrat",
-      date: "2026-06-14",
-      rating: 5,
-      comment: "Warm, precise, and beautifully paced. The delivery arrived neatly packed and early.",
-      verified: true,
-    },
-    {
-      id: "r2",
-      user: "Rafiq",
-      date: "2026-06-10",
-      rating: 4,
-      comment: "Feels like a city map drawn from memory and conversation.",
-      verified: true,
-    },
+const reviewNames = [
+  "Nusrat",
+  "Rafiq",
+  "Ayesha",
+  "Tanvir",
+  "Farida",
+  "Imran",
+  "Tania",
+  "Sadia",
+  "Mahir",
+  "Raisa",
+  "Shahriar",
+  "Nabila",
+  "Faria",
+  "Jannat",
+  "Asif",
+  "Nayem",
+  "Mou",
+  "Saimon",
+  "Ariya",
+  "Tahsin",
+  "Rifat",
+  "Shadman",
+  "Miftah",
+  "Nafisa",
+  "Tamim",
+  "Lamia",
+];
+
+const reviewPhrases: Record<string, string[]> = {
+  Fiction: [
+    "Beautiful pacing and vivid character work.",
+    "It reads like a letter passed between neighborhoods.",
+    "The emotional beats land with real care.",
+    "A warm, memorable story that feels easy to return to.",
   ],
-  "signal-after-dawn": [
-    {
-      id: "r3",
-      user: "Tania",
-      date: "2026-06-12",
-      rating: 5,
-      comment: "Smart worldbuilding and a surprisingly human center.",
-      verified: true,
-    },
-    {
-      id: "r4",
-      user: "Imran",
-      date: "2026-06-05",
-      rating: 4,
-      comment: "The setup made me want a sequel immediately.",
-      verified: true,
-    },
+  "Sci-Fi": [
+    "The future feels grounded and easy to believe.",
+    "Big ideas land without losing the human thread.",
+    "Sharp concepts, clean structure, and a strong hook.",
+    "A clever story that keeps the momentum moving.",
   ],
-  "cloud-systems-primer": [
-    {
-      id: "r5",
-      user: "Faria",
-      date: "2026-06-11",
-      rating: 5,
-      comment: "Clear enough for revision, deep enough for class projects.",
-      verified: true,
-    },
+  Academic: [
+    "Clear structure, useful examples, and easy revision.",
+    "Great for study sessions and quick refreshers.",
+    "The explanations stay practical from start to finish.",
+    "A solid pick when deadlines are getting close.",
+  ],
+  Business: [
+    "Practical frameworks I could apply immediately.",
+    "Short, sharp, and full of useful direction.",
+    "Good balance between strategy and execution.",
+    "The advice feels modern and easy to action.",
+  ],
+  History: [
+    "It balances memory, context, and detail really well.",
+    "The perspective feels rich and carefully researched.",
+    "A thoughtful look at how the past still shapes now.",
+    "Strong storytelling with a clear sense of place.",
+  ],
+  Poetry: [
+    "Every page feels intentional and quietly moving.",
+    "The imagery stays with you long after reading.",
+    "Compact lines, strong feeling, and a gentle rhythm.",
+    "A beautiful collection that rewards slow reading.",
+  ],
+  default: [
+    "A thoughtful read with a smooth delivery experience.",
+    "Well packed, well paced, and easy to recommend.",
+    "A dependable choice from this library shelf.",
   ],
 };
+
+function formatReviewDate(offset: number) {
+  const base = new Date(Date.UTC(2026, 5, 20));
+  base.setUTCDate(base.getUTCDate() - offset);
+  return base.toISOString().slice(0, 10);
+}
+
+function generateReviewsForBook(book: Book): Review[] {
+  const phrases = reviewPhrases[book.category] ?? reviewPhrases.default;
+
+  return Array.from({ length: book.reviews }, (_, index) => {
+    const rating = index % 11 === 0 ? 4 : 5;
+    const reviewer = reviewNames[(index + book.id.length) % reviewNames.length];
+    const comment = `${phrases[index % phrases.length]} ${reviewPhrases.default[index % reviewPhrases.default.length]}`;
+
+    return {
+      id: `review-${book.id}-${index + 1}`,
+      user: reviewer,
+      date: formatReviewDate(index),
+      rating,
+      comment,
+      verified: true,
+    };
+  });
+}
+
+export const reviewsByBook: Record<string, Review[]> = Object.fromEntries(
+  books.map((book) => [book.id, generateReviewsForBook(book)])
+);
 
 export const deliveryHistory: DeliveryRow[] = [
   {

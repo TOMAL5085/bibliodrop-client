@@ -191,6 +191,7 @@ export async function getBookDetailsFromApi(id: string) {
   const response = await fetchJson<{ data: ApiBook; reviews: Array<{ id: string; userEmail?: string; user?: string; date?: string; rating: number; comment: string; verified?: boolean }> }>(
     `/api/books/${id}`
   );
+  const localReviews = getReviewsForBook(id);
 
   if (!response?.data) {
     const localBook = getBookById(id);
@@ -200,7 +201,7 @@ export async function getBookDetailsFromApi(id: string) {
 
     return {
       book: localBook,
-      reviews: getReviewsForBook(id),
+      reviews: localReviews,
       similarBooks: getSimilarBooks(localBook),
     };
   }
@@ -215,10 +216,11 @@ export async function getBookDetailsFromApi(id: string) {
     comment: review.comment,
     verified: review.verified ?? false,
   }));
+  const resolvedReviews = localReviews.length > reviews.length ? localReviews : reviews;
 
   return {
     book,
-    reviews,
+    reviews: resolvedReviews,
     similarBooks: localBook ? getSimilarBooks(localBook) : [],
   };
 }
