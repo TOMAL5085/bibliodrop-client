@@ -288,7 +288,7 @@ export async function registerUser(payload: {
   };
 }
 
-export async function startGoogleSignIn(callbackURL: string) {
+export async function startGoogleSignIn(callbackURL: string, role?: string) {
   const response = await fetchJson<{
     url: string;
     redirect: boolean;
@@ -301,6 +301,7 @@ export async function startGoogleSignIn(callbackURL: string) {
       providerId: "google",
       callbackURL,
       disableRedirect: true,
+      role,
     }),
   });
 

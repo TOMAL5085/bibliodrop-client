@@ -89,8 +89,11 @@ export default function RegisterPage() {
     setGoogleLoading(true);
 
     try {
+      const roleSelect = document.querySelector('select[name="role"]') as HTMLSelectElement | null;
+      const role = roleSelect?.value || "user";
+
       const callbackURL = `${window.location.origin}/`;
-      const response = await startGoogleSignIn(callbackURL);
+      const response = await startGoogleSignIn(callbackURL, role);
 
       if (!response?.url) {
         toast.error("Google sign-in is not configured yet.");
