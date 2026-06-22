@@ -283,7 +283,7 @@ export const books: Book[] = [
   {
     id: "founders-and-funnels",
     title: "Founders and Funnels",
-    author: "Tanjina Sultana",
+    author: "Tanvir Islam",
     category: "Business",
     description:
       "A clean, practical guide to growth, revenue systems, and the product decisions that help small teams scale well.",
@@ -307,7 +307,7 @@ export const books: Book[] = [
   {
     id: "market-moves",
     title: "Market Moves",
-    author: "Miftah Chowdhury",
+    author: "Tanvir Islam",
     category: "Business",
     description:
       "A strategy book for founders and operators who want sharper decisions around pricing, positioning, and growth.",
