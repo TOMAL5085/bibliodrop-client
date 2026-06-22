@@ -335,7 +335,7 @@ export const books: Book[] = [
     category: "History",
     description:
       "Essays that trace how trade routes, ports, and river systems shaped the region across centuries of change.",
-    coverImage: "https://images.unsplash.com/photo-1455885666463-14c6f2343b3b?auto=format&fit=crop&w=1200&q=80",
+    coverImage: "https://images.unsplash.com/photo-1495446815901-a7297e633e8d?auto=format&fit=crop&w=1200&q=80",
     deliveryFee: 130,
     status: "published",
     availability: "Available",
@@ -407,7 +407,7 @@ export const books: Book[] = [
     category: "Poetry",
     description:
       "A compact, luminous set of poems shaped by rain, dusk, and the small rituals that make ordinary days feel sacred.",
-    coverImage: "https://images.unsplash.com/photo-1519167758481-83fdd3b6d6c2?auto=format&fit=crop&w=1200&q=80",
+    coverImage: "https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=1200&q=80",
     deliveryFee: 98,
     status: "published",
     availability: "Available",
