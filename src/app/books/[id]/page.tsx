@@ -171,7 +171,6 @@ export default async function BookDetailsPage({
         <SectionHeading
           eyebrow="Reviews"
           title="Verified reviews from delivered orders."
-          description="Only readers with a delivered record for this specific book are allowed to post feedback."
         />
         <div className="mt-8">
           <ReviewPager reviews={reviews} />
