@@ -79,7 +79,15 @@ export function SiteHeader() {
   return (
     <header className="sticky top-0 z-50 border-b border-slate-200/80 bg-white/85 backdrop-blur-xl">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
-        <Link href="/" className="flex items-center gap-3">
+        <Link
+          href="/"
+          onClick={() => {
+            setDashboardOpen(false);
+            setMobileOpen(false);
+            window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+          }}
+          className="flex items-center gap-3"
+        >
           <span className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-[1.15rem] bg-slate-950 shadow-sm ring-1 ring-slate-200">
             <Image
               src="/bibliodrop-navbar-logo.png"

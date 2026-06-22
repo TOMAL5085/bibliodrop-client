@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
+import { ScrollToTopOnRouteChange } from "@/components/scroll-to-top-on-route-change";
 import { Toaster } from "react-hot-toast";
 
 export const metadata: Metadata = {
@@ -27,6 +28,7 @@ export default function RootLayout({
       <body className="min-h-full bg-[radial-gradient(circle_at_top,_rgba(245,158,11,0.12),_transparent_30%),linear-gradient(180deg,#fffef9_0%,#f8fafc_28%,#ffffff_100%)] text-slate-950">
         <div className="flex min-h-screen flex-col">
           <SiteHeader />
+          <ScrollToTopOnRouteChange />
           <main className="flex-1">{children}</main>
           <SiteFooter />
         </div>
