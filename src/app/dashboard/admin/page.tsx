@@ -1,6 +1,42 @@
 import { CategoryPieChart, RevenueChart } from "@/components/charts";
 import { SectionHeading } from "@/components/section-heading";
-import { chartData, dashboardMetrics, books, transactions } from "@/lib/site-data";
+import { users } from "@/lib/server-state";
+import { books, transactions } from "@/lib/site-data";
+
+const monthLabels = ["Jan", "Feb", "Mar", "Apr", "May", "Jun"];
+
+function getMonthIndex(dateValue: string) {
+  const month = new Date(`${dateValue}T00:00:00Z`).getUTCMonth();
+  return Number.isNaN(month) ? 0 : month;
+}
+
+const totalUsers = users.length;
+const totalBooks = books.length;
+const publishedBooks = books.filter((book) => book.status === "published").length;
+const pendingApproval = books.filter((book) => book.status === "pending_approval").length;
+const checkedOutBooks = books.filter((book) => book.availability === "Checked Out").length;
+const totalRevenue = transactions.reduce((sum, transaction) => sum + transaction.amount, 0);
+
+const categoryCounts = books.reduce<Record<string, number>>((accumulator, book) => {
+  accumulator[book.category] = (accumulator[book.category] ?? 0) + 1;
+  return accumulator;
+}, {});
+
+const categoryPie = Object.entries(categoryCounts).map(([name, value]) => ({
+  name,
+  value,
+}));
+
+const revenueTrend = monthLabels.map((name, monthIndex) => {
+  const monthBooks = books.filter((book) => getMonthIndex(book.addedAt) === monthIndex);
+  return {
+    name,
+    books: monthBooks.length,
+    revenue: monthBooks.reduce((sum, book) => sum + book.deliveryFee, 0),
+  };
+});
+
+const pendingBooks = books.filter((book) => book.status === "pending_approval");
 
 export default function AdminDashboardPage() {
   return (
@@ -8,31 +44,42 @@ export default function AdminDashboardPage() {
       <SectionHeading
         eyebrow="Admin dashboard"
         title="Oversee users, books, approvals, and transactions."
-        description="Admins see the whole ecosystem: approval queue, user roles, inventory, and revenue visibility."
+        description="Admins see the current ecosystem: live inventory, user roles, review coverage, and revenue visibility."
       />
 
       <div className="grid gap-4 md:grid-cols-3">
-        {dashboardMetrics.admin.map((item) => (
-          <div key={item.label} className="glass-panel rounded-[2rem] p-6">
-            <p className="text-sm text-slate-500">{item.label}</p>
-            <p className="mt-3 text-4xl font-semibold text-slate-950">{item.value}</p>
-            <p className="mt-2 text-sm text-slate-600">{item.delta}</p>
-          </div>
-        ))}
+        <div className="glass-panel rounded-[2rem] p-6">
+          <p className="text-sm text-slate-500">Total users</p>
+          <p className="mt-3 text-4xl font-semibold text-slate-950">{totalUsers}</p>
+          <p className="mt-2 text-sm text-slate-600">Seeded accounts across all roles</p>
+        </div>
+        <div className="glass-panel rounded-[2rem] p-6">
+          <p className="text-sm text-slate-500">Total books</p>
+          <p className="mt-3 text-4xl font-semibold text-slate-950">{totalBooks}</p>
+          <p className="mt-2 text-sm text-slate-600">
+            {publishedBooks} published, {pendingApproval} pending approval, {checkedOutBooks}{" "}
+            checked out
+          </p>
+        </div>
+        <div className="glass-panel rounded-[2rem] p-6">
+          <p className="text-sm text-slate-500">Total revenue</p>
+          <p className="mt-3 text-4xl font-semibold text-slate-950">BDT {totalRevenue}</p>
+          <p className="mt-2 text-sm text-slate-600">From the current seeded transactions</p>
+        </div>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-[1.05fr_0.95fr]">
         <div className="glass-panel rounded-[2rem] p-6">
           <h2 className="text-xl font-semibold text-slate-950">Revenue trend</h2>
           <div className="mt-6">
-            <RevenueChart data={chartData.adminTrend} />
+            <RevenueChart data={revenueTrend} />
           </div>
         </div>
 
         <div className="glass-panel rounded-[2rem] p-6">
           <h2 className="text-xl font-semibold text-slate-950">Books by category</h2>
           <div className="mt-6">
-            <CategoryPieChart data={chartData.categoryPie} />
+            <CategoryPieChart data={categoryPie} />
           </div>
         </div>
       </div>
@@ -41,9 +88,8 @@ export default function AdminDashboardPage() {
         <div className="glass-panel rounded-[2rem] p-6">
           <h2 className="text-xl font-semibold text-slate-950">Approval queue</h2>
           <div className="mt-6 space-y-4">
-            {books
-              .filter((book) => book.status === "pending_approval")
-              .map((book) => (
+            {pendingBooks.length ? (
+              pendingBooks.map((book) => (
                 <div key={book.id} className="rounded-[1.5rem] border border-slate-200 bg-white p-4">
                   <div className="flex items-start justify-between gap-4">
                     <div>
@@ -62,7 +108,12 @@ export default function AdminDashboardPage() {
                     </div>
                   </div>
                 </div>
-              ))}
+              ))
+            ) : (
+              <div className="rounded-[1.5rem] border border-dashed border-slate-300 bg-white p-6 text-sm text-slate-600">
+                No books are waiting for approval right now.
+              </div>
+            )}
           </div>
         </div>
 
