@@ -3,14 +3,15 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, type ChangeEvent } from "react";
-import { Camera, Lock, Mail, User } from "lucide-react";
+import { Lock, Mail, User } from "lucide-react";
 import toast from "react-hot-toast";
-import { registerUser, uploadImage } from "@/lib/api";
+import { registerUser, startGoogleSignIn, uploadImage } from "@/lib/api";
 import type { AppRole } from "@/lib/auth-user";
 
 export default function RegisterPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const [photoUrl, setPhotoUrl] = useState("");
   const [uploadedFileName, setUploadedFileName] = useState("");
@@ -86,6 +87,26 @@ export default function RegisterPage() {
     }
   }
 
+  async function handleGoogleSignIn() {
+    setGoogleLoading(true);
+
+    try {
+      const callbackURL = `${window.location.origin}/dashboard`;
+      const response = await startGoogleSignIn(callbackURL);
+
+      if (!response?.url) {
+        toast.error("Google sign-in is not configured yet.");
+        return;
+      }
+
+      window.location.assign(response.url);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Google sign-in failed.");
+    } finally {
+      setGoogleLoading(false);
+    }
+  }
+
   return (
     <div className="mx-auto grid min-h-[calc(100vh-180px)] max-w-7xl gap-8 px-4 py-10 sm:px-6 lg:grid-cols-[1.05fr_0.95fr] lg:px-8">
       <div className="glass-panel rounded-[2.5rem] p-8">
@@ -94,8 +115,8 @@ export default function RegisterPage() {
           Register as a reader or a librarian.
         </h1>
         <p className="mt-5 max-w-xl text-sm leading-7 text-slate-600">
-          The form now talks directly to the Vercel-hosted API, supports profile image uploads,
-          and stores the role in MongoDB for dashboard routing.
+          The form now talks directly to the Vercel-hosted API, supports Google sign-in, supports
+          profile image uploads, and stores the role in MongoDB for dashboard routing.
         </p>
 
         <div className="mt-8 rounded-[2rem] border border-slate-200 bg-white p-5">
@@ -181,21 +202,16 @@ export default function RegisterPage() {
 
           <div className="grid gap-5 sm:grid-cols-[1fr_auto]">
             <div>
-              <label className="text-sm font-medium text-slate-700">Photo URL</label>
-              <div className="mt-2 flex items-center gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3">
-                <Camera className="h-4 w-4 text-slate-400" />
-                <input
-                  name="photoUrl"
-                  type="url"
-                  placeholder="https://..."
-                  className="w-full bg-transparent text-sm outline-none"
-                  value={photoUrl}
-                  onChange={(event) => setPhotoUrl(event.target.value)}
-                />
+              <p className="text-sm font-medium text-slate-700">Profile image</p>
+              <div className="mt-2 rounded-2xl border border-slate-200 bg-white px-4 py-3">
+                {uploadedFileName ? (
+                  <p className="text-sm text-slate-600">Uploaded: {uploadedFileName}</p>
+                ) : (
+                  <p className="text-sm text-slate-500">
+                    Upload a profile image to use for your account.
+                  </p>
+                )}
               </div>
-              {uploadedFileName ? (
-                <p className="mt-2 text-xs text-slate-500">Uploaded: {uploadedFileName}</p>
-              ) : null}
             </div>
             <label className="flex cursor-pointer items-center justify-center rounded-2xl border border-dashed border-slate-300 px-5 py-3 text-sm font-semibold text-slate-700">
               {uploadingPhoto ? "Uploading..." : "Upload image"}
@@ -209,6 +225,20 @@ export default function RegisterPage() {
             className="w-full rounded-full bg-slate-950 px-6 py-3 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60"
           >
             {loading ? "Creating account..." : "Register"}
+          </button>
+
+          <div className="relative py-2 text-center text-sm text-slate-400">
+            <span className="relative z-10 bg-white px-3">or continue with</span>
+            <div className="absolute left-0 top-1/2 h-px w-full bg-slate-200" />
+          </div>
+
+          <button
+            type="button"
+            onClick={handleGoogleSignIn}
+            disabled={googleLoading}
+            className="w-full rounded-full border border-slate-300 px-6 py-3 text-sm font-semibold text-slate-700 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {googleLoading ? "Opening Google..." : "Continue with Google"}
           </button>
 
           <p className="text-center text-sm text-slate-500">
