@@ -304,6 +304,17 @@ export async function listDeliveries() {
   return [...memoryStore.deliveries];
 }
 
+export async function countUsers() {
+  await seedCollections();
+
+  if (isMongoEnabled()) {
+    const collections = await getCollections();
+    return (await collections?.users.estimatedDocumentCount()) ?? 0;
+  }
+
+  return memoryStore.users.length;
+}
+
 export async function createDeliveryRequest(input: { bookId: string; userEmail: string }) {
   await seedCollections();
   const book = getBookById(input.bookId);
@@ -412,11 +423,24 @@ export async function listTransactions() {
   return [...memoryStore.transactions];
 }
 
-export function getDashboardPayload(role: string) {
+export async function getDashboardPayload(role: string) {
+  if (role === "admin") {
+    const liveTransactions = await listTransactions();
+    return {
+      stats: [
+        { label: "Total users", value: await countUsers() },
+        { label: "Total books", value: books.length },
+        {
+          label: "Total revenue",
+          value: liveTransactions.reduce((sum, transaction) => sum + transaction.amount, 0),
+        },
+      ],
+    };
+  }
+
   const response = {
     user: dashboardMetrics.user,
     librarian: dashboardMetrics.librarian,
-    admin: dashboardMetrics.admin,
   };
 
   return response[role as keyof typeof response] ?? null;
