@@ -331,7 +331,7 @@ export const books: Book[] = [
   {
     id: "river-of-empires",
     title: "River of Empires",
-    author: "Rafiq Ahmed",
+    author: "Nayeem Khan",
     category: "History",
     description:
       "Essays that trace how trade routes, ports, and river systems shaped the region across centuries of change.",
@@ -339,12 +339,12 @@ export const books: Book[] = [
     deliveryFee: 130,
     status: "published",
     availability: "Available",
-    provider: "Rafiq Hasan",
-    providerEmail: "rafiq@example.com",
+    provider: "Nayeem Khan",
+    providerEmail: "nayeem@example.com",
     providerRole: "librarian",
-    providerAvatar: "RH",
+    providerAvatar: "NK",
     providerPhoto:
-      "/download.png",
+      "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=256&h=256&fit=crop",
     addedAt: "2026-05-11",
     coverStart: "#fb923c",
     coverEnd: "#facc15",
@@ -355,7 +355,7 @@ export const books: Book[] = [
   {
     id: "chronicles-of-the-delta",
     title: "Chronicles of the Delta",
-    author: "Nabila Khan",
+    author: "Nayeem Khan",
     category: "History",
     description:
       "A reflective history of river life, civic memory, and the people who kept local archives alive for generations.",
@@ -363,12 +363,12 @@ export const books: Book[] = [
     deliveryFee: 102,
     status: "published",
     availability: "Available",
-    provider: "Rafiq Hasan",
-    providerEmail: "rafiq@example.com",
+    provider: "Nayeem Khan",
+    providerEmail: "nayeem@example.com",
     providerRole: "librarian",
-    providerAvatar: "RH",
+    providerAvatar: "NK",
     providerPhoto:
-      "/download.png",
+      "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=256&h=256&fit=crop",
     addedAt: "2026-05-07",
     coverStart: "#cbd5e1",
     coverEnd: "#475569",
@@ -379,7 +379,7 @@ export const books: Book[] = [
   {
     id: "salt-in-the-margins",
     title: "Salt in the Margins",
-    author: "Jannatul Ferdous",
+    author: "Farida Akter",
     category: "Poetry",
     description:
       "A reflective poetry collection of sea-salt kitchens, monsoon afternoons, and the life held between margins.",
@@ -403,7 +403,7 @@ export const books: Book[] = [
   {
     id: "quiet-weather",
     title: "Quiet Weather",
-    author: "Shamim Alvi",
+    author: "Farida Akter",
     category: "Poetry",
     description:
       "A compact, luminous set of poems shaped by rain, dusk, and the small rituals that make ordinary days feel sacred.",
