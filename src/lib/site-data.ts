@@ -115,7 +115,7 @@ export const providers = [
       "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=256&h=256&fit=crop",
     completedDeliveries: 368,
     city: "Chattogram",
-    specialty: "Sci-Fi",
+    specialty: "History",
   },
   {
     name: "Nusrat Jahan",
@@ -142,7 +142,7 @@ export const providers = [
       "/download.png",
     completedDeliveries: 315,
     city: "Rajshahi",
-    specialty: "History",
+    specialty: "Sci-Fi",
   },
   {
     name: "Farida Akter",
