@@ -2,12 +2,10 @@ import crypto from "node:crypto";
 import { MongoClient, type Collection } from "mongodb";
 import {
   type Book,
-  books,
+  books as seedBooks,
   dashboardMetrics,
   getBookById,
-  getFilteredBooks,
   getReviewsForBook,
-  getSimilarBooks,
   reviewsByBook,
   transactions as seededTransactions,
 } from "@/lib/site-data";
@@ -47,6 +45,7 @@ type UserDocument = AuthUser & {
 
 type Collections = {
   users: Collection<UserDocument>;
+  books: Collection<Book>;
   deliveries: Collection<DeliveryRecord>;
   reviews: Collection<ReviewRecord>;
   transactions: Collection<TransactionRecord>;
@@ -121,6 +120,7 @@ const memoryStore = {
       passwordHash: hashPassword("Admin@123"),
     },
   ] as AuthUser[],
+  books: [...seedBooks] as Book[],
   deliveries: [
     {
       id: "d1",
@@ -130,6 +130,24 @@ const memoryStore = {
       status: "Delivered" as const,
       amount: 120,
       date: "2026-06-12",
+    },
+    {
+      id: "d2",
+      userEmail: "rahim@example.com",
+      librarianEmail: "nusrat@example.com",
+      bookId: "cloud-systems-primer",
+      status: "Delivered" as const,
+      amount: 110,
+      date: "2026-06-14",
+    },
+    {
+      id: "d3",
+      userEmail: "rahim@example.com",
+      librarianEmail: "rafiq@example.com",
+      bookId: "river-of-empires",
+      status: "Delivered" as const,
+      amount: 115,
+      date: "2026-06-16",
     },
   ] as DeliveryRecord[],
   reviews: Object.entries(reviewsByBook).flatMap(([bookId, items]) =>
@@ -174,6 +192,7 @@ async function getCollections(): Promise<Collections | null> {
   const db = client.db();
   return {
     users: db.collection<UserDocument>("users"),
+    books: db.collection<Book>("books"),
     deliveries: db.collection<DeliveryRecord>("deliveries"),
     reviews: db.collection<ReviewRecord>("reviews"),
     transactions: db.collection<TransactionRecord>("transactions"),
@@ -201,8 +220,26 @@ async function seedCollections() {
         );
       }
 
-      if ((await collections.deliveries.estimatedDocumentCount()) === 0) {
-        await collections.deliveries.insertMany(memoryStore.deliveries);
+      const seededBooks = await collections.books
+        .find({ id: { $in: memoryStore.books.map((book) => book.id) } })
+        .project({ id: 1 })
+        .toArray();
+      const existingBookIds = new Set(seededBooks.map((book) => book.id));
+      const missingBooks = memoryStore.books.filter((book) => !existingBookIds.has(book.id));
+      if (missingBooks.length > 0) {
+        await collections.books.insertMany(missingBooks);
+      }
+
+      const seededDeliveries = await collections.deliveries
+        .find({ id: { $in: memoryStore.deliveries.map((delivery) => delivery.id) } })
+        .project({ id: 1 })
+        .toArray();
+      const existingDeliveryIds = new Set(seededDeliveries.map((delivery) => delivery.id));
+      const missingDeliveries = memoryStore.deliveries.filter(
+        (delivery) => !existingDeliveryIds.has(delivery.id)
+      );
+      if (missingDeliveries.length > 0) {
+        await collections.deliveries.insertMany(missingDeliveries);
       }
 
       if ((await collections.reviews.estimatedDocumentCount()) === 0) {
@@ -238,6 +275,67 @@ function findLocalUserById(id: string) {
   return memoryStore.users.find((user) => user.id === id);
 }
 
+function findLocalBookById(id: string) {
+  return memoryStore.books.find((book) => book.id === id);
+}
+
+function matchesBookFilters(
+  book: Book,
+  filters: {
+    query?: string;
+    category?: string;
+    status?: string;
+    fee?: string;
+    sort?: string;
+  }
+) {
+  const query = filters.query?.trim().toLowerCase();
+  const category = filters.category?.trim().toLowerCase();
+  const status = filters.status?.trim().toLowerCase();
+
+  if (query) {
+    const haystack = `${book.title} ${book.author} ${book.category} ${book.description}`.toLowerCase();
+    if (!haystack.includes(query)) {
+      return false;
+    }
+  }
+
+  if (category && book.category.toLowerCase() !== category) {
+    return false;
+  }
+
+  if (status && book.status.toLowerCase() !== status) {
+    return false;
+  }
+
+  return true;
+}
+
+function sortBooks(booksToSort: Book[], sort?: string) {
+  const sortedBooks = [...booksToSort];
+
+  if (sort === "fee-asc") {
+    sortedBooks.sort((left, right) => left.deliveryFee - right.deliveryFee);
+  } else if (sort === "fee-desc") {
+    sortedBooks.sort((left, right) => right.deliveryFee - left.deliveryFee);
+  } else if (sort === "rating-desc") {
+    sortedBooks.sort((left, right) => right.rating - left.rating);
+  }
+
+  return sortedBooks;
+}
+
+async function getBookStore() {
+  await seedCollections();
+
+  if (isMongoEnabled()) {
+    const collections = await getCollections();
+    return (await collections?.books.find().toArray()) ?? [];
+  }
+
+  return [...memoryStore.books];
+}
+
 export async function findUserByEmail(email: string) {
   await seedCollections();
 
@@ -260,6 +358,11 @@ export async function findUserById(id: string) {
   }
 
   return findLocalUserById(id) ?? null;
+}
+
+export async function findBookById(id: string) {
+  const books = await getBookStore();
+  return books.find((book) => book.id === id) ?? null;
 }
 
 export async function createUser(input: {
@@ -304,6 +407,27 @@ export async function listDeliveries() {
   return [...memoryStore.deliveries];
 }
 
+export async function listBooks(filters: {
+  query?: string;
+  category?: string;
+  status?: string;
+  fee?: string;
+  sort?: string;
+}) {
+  const books = await getBookStore();
+  let result = books.filter((book) => matchesBookFilters(book, filters));
+
+  if (filters.fee === "under-120") {
+    result = result.filter((book) => book.deliveryFee < 120);
+  } else if (filters.fee === "120-140") {
+    result = result.filter((book) => book.deliveryFee >= 120 && book.deliveryFee <= 140);
+  } else if (filters.fee === "over-140") {
+    result = result.filter((book) => book.deliveryFee > 140);
+  }
+
+  return sortBooks(result, filters.sort);
+}
+
 export async function countUsers() {
   await seedCollections();
 
@@ -313,6 +437,17 @@ export async function countUsers() {
   }
 
   return memoryStore.users.length;
+}
+
+export async function countBooks(filters?: {
+  query?: string;
+  category?: string;
+  status?: string;
+  fee?: string;
+  sort?: string;
+}) {
+  const books = await getBookStore();
+  return books.filter((book) => matchesBookFilters(book, filters ?? {})).length;
 }
 
 export async function createDeliveryRequest(input: { bookId: string; userEmail: string }) {
@@ -433,18 +568,18 @@ export function getDashboardPayload(role: string) {
   return response[role as keyof typeof response] ?? null;
 }
 
-export function getBooksFromApi(filters: {
+export async function getBooksFromApi(filters: {
   query?: string;
   category?: string;
   status?: string;
   fee?: string;
   sort?: string;
 }) {
-  return getFilteredBooks(filters);
+  return listBooks(filters);
 }
 
-export function getBookDetails(id: string) {
-  const book = getBookById(id);
+export async function getBookDetails(id: string) {
+  const book = (await findBookById(id)) ?? getBookById(id);
   if (!book) {
     return null;
   }
@@ -452,12 +587,19 @@ export function getBookDetails(id: string) {
   return {
     book,
     reviews: getReviewsForBook(id),
-    similarBooks: getSimilarBooks(book),
+    similarBooks: (await getBookStore())
+      .filter(
+        (item) =>
+          item.id !== book.id &&
+          item.status === "published" &&
+          item.author === book.author
+      )
+      .slice(0, 3),
   };
 }
 
-export function getApprovalQueue() {
-  return books.filter((book) => book.status === "pending_approval");
+export async function getApprovalQueue() {
+  return listBooks({ status: "pending_approval" });
 }
 
 export function sanitizeUser(user: AuthUser) {
@@ -511,7 +653,13 @@ export async function createBook(input: {
     featured: false,
   };
 
-  books.push(newBook);
+  if (isMongoEnabled()) {
+    const collections = await getCollections();
+    await collections?.books.insertOne(newBook);
+  } else {
+    memoryStore.books.push(newBook);
+  }
+
   return newBook;
 }
 

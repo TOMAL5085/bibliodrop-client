@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getBooksFromApi, createBook } from "@/lib/persistence";
 
-export function GET(request: NextRequest) {
+export async function GET(request: NextRequest) {
   const filters = {
     query: request.nextUrl.searchParams.get("query") ?? "",
     category: request.nextUrl.searchParams.get("category") ?? "",
@@ -10,7 +10,7 @@ export function GET(request: NextRequest) {
     sort: request.nextUrl.searchParams.get("sort") ?? "",
   };
 
-  return NextResponse.json({ data: getBooksFromApi(filters) });
+  return NextResponse.json({ data: await getBooksFromApi(filters) });
 }
 
 export async function POST(request: Request) {

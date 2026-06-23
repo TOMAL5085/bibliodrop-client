@@ -1,7 +1,6 @@
 import { CategoryPieChart, RevenueChart } from "@/components/charts";
 import { SectionHeading } from "@/components/section-heading";
-import { countUsers } from "@/lib/persistence";
-import { books, transactions } from "@/lib/site-data";
+import { countBooks, countUsers, listBooks, listTransactions } from "@/lib/persistence";
 
 export const dynamic = "force-dynamic";
 
@@ -47,38 +46,42 @@ async function getLiveUserCount() {
   return countUsers();
 }
 
-const totalBooks = books.length;
-const publishedBooks = books.filter((book) => book.status === "published").length;
-const pendingApproval = books.filter((book) => book.status === "pending_approval").length;
-const checkedOutBooks = books.filter((book) => book.availability === "Checked Out").length;
-const totalRevenue = transactions.reduce((sum, transaction) => sum + transaction.amount, 0);
-
-const categoryCounts = books.reduce<Record<string, number>>((accumulator, book) => {
-  accumulator[book.category] = (accumulator[book.category] ?? 0) + 1;
-  return accumulator;
-}, {});
-
-const categoryPie = Object.entries(categoryCounts).map(([name, value]) => ({
-  name,
-  value,
-}));
-
-const revenueTrend = monthLabels.map((name, monthIndex) => {
-  const monthTransactions = transactions.filter(
-    (transaction) => getMonthIndex(transaction.date) === monthIndex
-  );
-
-  return {
-    name,
-    books: monthTransactions.length,
-    revenue: monthTransactions.reduce((sum, transaction) => sum + transaction.amount, 0),
-  };
-});
-
-const pendingBooks = books.filter((book) => book.status === "pending_approval");
-
 export default async function AdminDashboardPage() {
-  const totalUsers = await getLiveUserCount();
+  const [totalUsers, books, transactions] = await Promise.all([
+    getLiveUserCount(),
+    listBooks({}),
+    listTransactions(),
+  ]);
+
+  const totalBooks = await countBooks();
+  const publishedBooks = books.filter((book) => book.status === "published").length;
+  const pendingApproval = books.filter((book) => book.status === "pending_approval").length;
+  const checkedOutBooks = books.filter((book) => book.availability === "Checked Out").length;
+  const totalRevenue = transactions.reduce((sum, transaction) => sum + transaction.amount, 0);
+
+  const categoryCounts = books.reduce<Record<string, number>>((accumulator, book) => {
+    accumulator[book.category] = (accumulator[book.category] ?? 0) + 1;
+    return accumulator;
+  }, {});
+
+  const categoryPie = Object.entries(categoryCounts).map(([name, value]) => ({
+    name,
+    value,
+  }));
+
+  const revenueTrend = monthLabels.map((name, monthIndex) => {
+    const monthTransactions = transactions.filter(
+      (transaction) => getMonthIndex(transaction.date) === monthIndex
+    );
+
+    return {
+      name,
+      books: monthTransactions.length,
+      revenue: monthTransactions.reduce((sum, transaction) => sum + transaction.amount, 0),
+    };
+  });
+
+  const pendingBooks = books.filter((book) => book.status === "pending_approval");
 
   return (
     <div className="space-y-8">

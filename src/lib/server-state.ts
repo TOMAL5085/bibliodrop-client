@@ -116,6 +116,24 @@ export const deliveries: DeliveryRecord[] = [
     amount: 120,
     date: "2026-06-12",
   },
+  {
+    id: "d2",
+    userEmail: "rahim@example.com",
+    librarianEmail: "nusrat@example.com",
+    bookId: "cloud-systems-primer",
+    status: "Delivered",
+    amount: 110,
+    date: "2026-06-14",
+  },
+  {
+    id: "d3",
+    userEmail: "rahim@example.com",
+    librarianEmail: "rafiq@example.com",
+    bookId: "river-of-empires",
+    status: "Delivered",
+    amount: 115,
+    date: "2026-06-16",
+  },
 ];
 
 export const reviews: ReviewRecord[] = Object.entries(reviewsByBook).flatMap(([bookId, items]) =>

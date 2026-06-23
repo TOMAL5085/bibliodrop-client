@@ -3,8 +3,8 @@ import Image from "next/image";
 import { ArrowRight, BookOpen, Sparkles, Truck, Users } from "lucide-react";
 import { BookCard } from "@/components/book-card";
 import { SectionHeading } from "@/components/section-heading";
-import { categories, providers, books } from "@/lib/site-data";
-import { listDeliveries } from "@/lib/persistence";
+import { categories, providers } from "@/lib/site-data";
+import { countBooks, listDeliveries } from "@/lib/persistence";
 import { getFeaturedBooksFromApi } from "@/lib/api";
 
 function formatCount(value: number) {
@@ -23,7 +23,7 @@ function isSameCurrentMonth(dateValue: string, referenceDate = new Date()) {
 export default async function HomePage() {
   const featuredBooks = await getFeaturedBooksFromApi();
   const deliveries = await listDeliveries();
-  const publishedBooksCount = books.filter((book) => book.status === "published").length;
+  const publishedBooksCount = await countBooks({ status: "published" });
   const deliveredThisMonthCount = deliveries.filter(
     (delivery) => delivery.status === "Delivered" && isSameCurrentMonth(delivery.date)
   ).length;
