@@ -304,6 +304,17 @@ export async function listDeliveries() {
   return [...memoryStore.deliveries];
 }
 
+export async function countUsers() {
+  await seedCollections();
+
+  if (isMongoEnabled()) {
+    const collections = await getCollections();
+    return (await collections?.users.estimatedDocumentCount()) ?? 0;
+  }
+
+  return memoryStore.users.length;
+}
+
 export async function createDeliveryRequest(input: { bookId: string; userEmail: string }) {
   await seedCollections();
   const book = getBookById(input.bookId);

@@ -1,16 +1,52 @@
 import { CategoryPieChart, RevenueChart } from "@/components/charts";
 import { SectionHeading } from "@/components/section-heading";
-import { users } from "@/lib/server-state";
+import { countUsers } from "@/lib/persistence";
 import { books, transactions } from "@/lib/site-data";
 
+export const dynamic = "force-dynamic";
+
 const monthLabels = ["Jan", "Feb", "Mar", "Apr", "May", "Jun"];
+const apiBaseUrl =
+  process.env.NEXT_PUBLIC_API_BASE_URL?.replace(/\/$/, "") ||
+  process.env.NEXT_PUBLIC_BASE_URL?.replace(/\/$/, "");
 
 function getMonthIndex(dateValue: string) {
   const month = new Date(`${dateValue}T00:00:00Z`).getUTCMonth();
   return Number.isNaN(month) ? 0 : month;
 }
 
-const totalUsers = users.length;
+async function getLiveUserCount() {
+  if (apiBaseUrl) {
+    try {
+      const response = await fetch(`${apiBaseUrl}/api/dashboard/admin`, {
+        cache: "no-store",
+      });
+
+      if (response.ok) {
+        const payload = (await response.json()) as {
+          data?: { stats?: Array<{ label: string; value: string | number }> };
+        };
+
+        const totalUsersStat = payload.data?.stats?.find((stat) => stat.label === "Total users");
+        if (typeof totalUsersStat?.value === "number") {
+          return totalUsersStat.value;
+        }
+
+        if (typeof totalUsersStat?.value === "string") {
+          const parsedValue = Number(totalUsersStat.value.replace(/[^0-9]/g, ""));
+          if (!Number.isNaN(parsedValue)) {
+            return parsedValue;
+          }
+        }
+      }
+    } catch {
+      // Fall back to the local database if the backend API is unavailable.
+    }
+  }
+
+  return countUsers();
+}
+
 const totalBooks = books.length;
 const publishedBooks = books.filter((book) => book.status === "published").length;
 const pendingApproval = books.filter((book) => book.status === "pending_approval").length;
@@ -41,7 +77,9 @@ const revenueTrend = monthLabels.map((name, monthIndex) => {
 
 const pendingBooks = books.filter((book) => book.status === "pending_approval");
 
-export default function AdminDashboardPage() {
+export default async function AdminDashboardPage() {
+  const totalUsers = await getLiveUserCount();
+
   return (
     <div className="space-y-8">
       <SectionHeading
@@ -54,7 +92,7 @@ export default function AdminDashboardPage() {
         <div className="glass-panel rounded-[2rem] p-6">
           <p className="text-sm text-slate-500">Total users</p>
           <p className="mt-3 text-4xl font-semibold text-slate-950">{totalUsers}</p>
-          <p className="mt-2 text-sm text-slate-600">Seeded accounts across all roles</p>
+          <p className="mt-2 text-sm text-slate-600">Live accounts across all roles</p>
         </div>
         <div className="glass-panel rounded-[2rem] p-6">
           <p className="text-sm text-slate-500">Total books</p>
@@ -67,7 +105,7 @@ export default function AdminDashboardPage() {
         <div className="glass-panel rounded-[2rem] p-6">
           <p className="text-sm text-slate-500">Total revenue</p>
           <p className="mt-3 text-4xl font-semibold text-slate-950">BDT {totalRevenue}</p>
-          <p className="mt-2 text-sm text-slate-600">From the current seeded transactions</p>
+          <p className="mt-2 text-sm text-slate-600">From the current live transactions</p>
         </div>
       </div>
 
@@ -75,7 +113,8 @@ export default function AdminDashboardPage() {
         <div className="glass-panel rounded-[2rem] p-6">
           <h2 className="text-xl font-semibold text-slate-950">Revenue trend</h2>
           <p className="mt-2 text-sm text-slate-500">
-            This chart now follows the transaction records, so it matches the total revenue card.
+            This chart follows the transaction records, so it stays aligned with the total revenue
+            card.
           </p>
           <div className="mt-6">
             <RevenueChart data={revenueTrend} />
@@ -106,7 +145,7 @@ export default function AdminDashboardPage() {
                     </div>
                     <div className="flex gap-2">
                       <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700">
-                        Approve & publish
+                        Approve &amp; publish
                       </span>
                       <span className="rounded-full bg-rose-100 px-3 py-1 text-xs font-semibold text-rose-700">
                         Delete
