@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ChangeEvent } from "react";
 import Link from "next/link";
 import { ActivityBarChart } from "@/components/charts";
 import { SectionHeading } from "@/components/section-heading";
-import { getSession } from "@/lib/api";
+import { getSession, uploadImage } from "@/lib/api";
 import toast from "react-hot-toast";
 
 type BookRow = {
@@ -30,6 +30,26 @@ type Metric = {
   delta: string;
 };
 
+type ApiBook = {
+  id: string;
+  author: string;
+  deliveryFee: number;
+  providerEmail?: string;
+  provider?: string;
+  title?: string;
+  category?: string;
+  status?: string;
+};
+
+type ApiDelivery = {
+  id: string;
+  librarianEmail?: string;
+  userEmail?: string;
+  bookId: string;
+  status: string;
+  amount: number;
+};
+
 export default function LibrarianDashboardPage() {
   const [loading, setLoading] = useState(true);
   const [metrics, setMetrics] = useState<Metric[]>([]);
@@ -37,6 +57,8 @@ export default function LibrarianDashboardPage() {
   const [deliveries, setDeliveries] = useState<DeliveryRow[]>([]);
   const [userEmail, setUserEmail] = useState("");
   const [userName, setUserName] = useState("");
+  const [uploadingCoverImage, setUploadingCoverImage] = useState(false);
+  const [coverImageUrl, setCoverImageUrl] = useState("");
 
   async function loadData() {
     try {
@@ -49,18 +71,29 @@ export default function LibrarianDashboardPage() {
 
       // Fetch books
       const booksRes = await fetch("/api/books");
-      const booksData = await booksRes.json();
-      const allBooks = (booksData?.data || []) as any[];
+      const booksData = (await booksRes.json()) as { data?: ApiBook[] };
+      const allBooks = booksData.data ?? [];
 
       // Filter librarian's books
-      const myBooks = allBooks.filter(
-        (b) => b.providerEmail?.toLowerCase() === email || b.provider?.toLowerCase() === name.toLowerCase()
-      );
+      const myBooks = allBooks
+        .filter(
+          (b) =>
+            b.providerEmail?.toLowerCase() === email ||
+            b.provider?.toLowerCase() === name.toLowerCase()
+        )
+        .map((book) => ({
+          id: book.id,
+          title: book.title ?? "Untitled",
+          author: book.author,
+          category: book.category ?? "Uncategorized",
+          status: book.status ?? "published",
+          deliveryFee: book.deliveryFee,
+        }));
 
       // Fetch deliveries
       const delRes = await fetch("/api/deliveries");
-      const delData = await delRes.json();
-      const allDeliveries = (delData?.data || []) as any[];
+      const delData = (await delRes.json()) as { data?: ApiDelivery[] };
+      const allDeliveries = delData.data ?? [];
 
       // Filter librarian's deliveries
       const myDeliveries = allDeliveries.filter(
@@ -72,8 +105,8 @@ export default function LibrarianDashboardPage() {
         const book = allBooks.find((b) => b.id === d.bookId);
         return {
           id: d.id,
-          recipient: d.userEmail,
-          title: book ? book.title : d.bookId,
+          recipient: d.userEmail ?? "Unknown reader",
+          title: book?.title ?? d.bookId,
           status: d.status,
           fee: d.amount,
         };
@@ -103,6 +136,7 @@ export default function LibrarianDashboardPage() {
   }
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     loadData();
   }, []);
 
@@ -114,7 +148,7 @@ export default function LibrarianDashboardPage() {
     const description = String(formData.get("description") || "").trim();
     const deliveryFee = Number(formData.get("deliveryFee") || 100);
     const category = String(formData.get("category") || "Fiction").trim();
-    const coverImage = String(formData.get("coverImage") || "").trim();
+    const coverImage = coverImageUrl.trim();
 
     if (!title || !author) {
       toast.error("Title and author are required.");
@@ -146,6 +180,31 @@ export default function LibrarianDashboardPage() {
       }
     } catch {
       toast.error("An error occurred. Please try again.");
+    }
+  }
+
+  async function handleCoverImageUpload(event: ChangeEvent<HTMLInputElement>) {
+    const input = event.currentTarget;
+    const file = input.files?.[0];
+    if (!file) {
+      return;
+    }
+
+    setUploadingCoverImage(true);
+    try {
+      const url = await uploadImage(file);
+      if (!url) {
+        toast.error("Cover image upload failed. Please try again.");
+        return;
+      }
+
+      setCoverImageUrl(url);
+      toast.success("Cover image uploaded.");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Cover image upload failed.");
+    } finally {
+      setUploadingCoverImage(false);
+      input.value = "";
     }
   }
 
@@ -245,8 +304,23 @@ export default function LibrarianDashboardPage() {
               </select>
             </div>
             <div>
-              <label className="text-sm font-medium text-slate-700">Cover Image URL</label>
-              <input name="coverImage" placeholder="https://..." className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none" />
+              <label className="text-sm font-medium text-slate-700">Cover Image</label>
+              <div className="mt-2 flex flex-col gap-3 sm:flex-row sm:items-center">
+                <label className="inline-flex w-full cursor-pointer items-center justify-center rounded-2xl border border-dashed border-slate-300 px-5 py-3 text-sm font-semibold text-slate-700 sm:w-auto">
+                  {uploadingCoverImage ? "Uploading..." : coverImageUrl ? "Replace image" : "Upload image"}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={handleCoverImageUpload}
+                  />
+                </label>
+                {coverImageUrl ? (
+                  <span className="break-all text-xs text-slate-500">{coverImageUrl}</span>
+                ) : (
+                  <span className="text-xs text-slate-500">Upload from your laptop to set the cover image.</span>
+                )}
+              </div>
             </div>
             <button type="submit" className="w-full rounded-full bg-slate-950 px-6 py-3 text-sm font-semibold text-white hover:bg-slate-800 transition">
               Submit for approval

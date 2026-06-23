@@ -31,6 +31,7 @@ export function DashboardShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const isAdminDashboard = pathname.startsWith("/dashboard/admin");
+  const isLibrarianDashboard = pathname.startsWith("/dashboard/librarian");
   const [status, setStatus] = useState<"loading" | "authenticated" | "unauthenticated">(
     "loading"
   );
@@ -119,7 +120,9 @@ export function DashboardShell({ children }: { children: ReactNode }) {
   const currentUser = user as SessionUser;
   const visibleDashboardLinks = isAdminDashboard
     ? dashboardLinks.filter((item) => item.href === "/dashboard/admin")
-    : dashboardLinks;
+    : isLibrarianDashboard
+      ? dashboardLinks.filter((item) => item.href === "/dashboard/librarian")
+      : dashboardLinks;
   return (
     <div className="min-h-screen bg-slate-50">
       <div className="mx-auto flex max-w-7xl flex-col px-4 py-6 sm:px-6 lg:flex-row lg:gap-8 lg:px-8">
@@ -171,7 +174,7 @@ export function DashboardShell({ children }: { children: ReactNode }) {
             })}
           </nav>
 
-          {!isAdminDashboard ? (
+          {!isAdminDashboard && !isLibrarianDashboard ? (
             <div className="mt-6 rounded-[1.5rem] bg-slate-950 p-5 text-white">
               <p className="text-sm font-semibold uppercase tracking-[0.25em] text-white/70">
                 Session status
