@@ -97,8 +97,7 @@ export default async function HomePage() {
                   <p className="text-xs uppercase tracking-[0.3em] text-white/60">Delivery path</p>
                   <h2 className="mt-3 text-3xl font-semibold">Pending to doorstep</h2>
                   <p className="mt-3 text-sm leading-7 text-slate-300">
-                    Stripe-backed checkout, verified reviews, and status updates for every
-                    request.
+                    Live inventory, trusted providers, and clear status updates for every request.
                   </p>
                 </div>
                 <div className="rounded-[2rem] border border-slate-200 bg-white p-6">
@@ -127,9 +126,9 @@ export default async function HomePage() {
 
               <div className="mt-4 grid gap-4 sm:grid-cols-3">
                 {[
-                  { label: "Checkout", value: "Stripe" },
-                  { label: "Auth", value: "Better Auth" },
-                  { label: "Uploads", value: "imgBB" },
+                  { label: "Catalog", value: "Live books" },
+                  { label: "Delivery", value: "Tracked requests" },
+                  { label: "Reviews", value: "Verified feedback" },
                 ].map((item) => (
                   <div key={item.label} className="rounded-[1.5rem] border border-slate-200 p-4">
                     <p className="text-xs uppercase tracking-[0.3em] text-slate-500">{item.label}</p>
