@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useState, type ChangeEvent } from "react";
 import { Lock, Mail, User } from "lucide-react";
 import toast from "react-hot-toast";
@@ -10,6 +10,8 @@ import type { AppRole } from "@/lib/auth-user";
 
 export default function RegisterPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const initialRole = searchParams.get("role") === "librarian" ? "librarian" : "user";
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
@@ -137,7 +139,7 @@ export default function RegisterPage() {
               <label className="text-sm font-medium text-slate-700">Role</label>
               <select
                 name="role"
-                defaultValue="user"
+                defaultValue={initialRole}
                 className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none"
               >
                 <option value="user">User / Reader</option>
