@@ -27,13 +27,37 @@ type Metric = {
   delta: string;
 };
 
+type ApiBook = {
+  id: string;
+  title: string;
+  author: string;
+  category: string;
+};
+
+type ApiDelivery = {
+  id: string;
+  userEmail?: string;
+  bookId: string;
+  date: string;
+  status: string;
+  amount: number;
+};
+
+type ApiReview = {
+  id: string;
+  userEmail?: string;
+  bookId: string;
+  rating: number;
+  comment: string;
+  date?: string;
+};
+
 export default function UserDashboardPage() {
   const [loading, setLoading] = useState(true);
   const [metrics, setMetrics] = useState<Metric[]>([]);
   const [deliveries, setDeliveries] = useState<DeliveryRow[]>([]);
   const [readingList, setReadingList] = useState<string[]>([]);
   const [reviews, setReviews] = useState<UserReview[]>([]);
-  const [userEmail, setUserEmail] = useState("");
 
   useEffect(() => {
     async function loadData() {
@@ -41,17 +65,16 @@ export default function UserDashboardPage() {
         const session = await getSession();
         if (!session?.user) return;
         const email = session.user.email.toLowerCase();
-        setUserEmail(email);
 
         // Fetch deliveries
         const delRes = await fetch("/api/deliveries");
-        const delData = await delRes.json();
-        const allDeliveries = (delData?.data || []) as any[];
+        const delData = (await delRes.json()) as { data?: ApiDelivery[] };
+        const allDeliveries = delData.data ?? [];
 
         // Fetch books to resolve titles
         const booksRes = await fetch("/api/books");
-        const booksData = await booksRes.json();
-        const allBooks = (booksData?.data || []) as any[];
+        const booksData = (await booksRes.json()) as { data?: ApiBook[] };
+        const allBooks = booksData.data ?? [];
 
         // Filter user deliveries
         const myDeliveries = allDeliveries.filter(
@@ -89,8 +112,8 @@ export default function UserDashboardPage() {
 
         // Fetch reviews
         const revRes = await fetch("/api/reviews");
-        const revData = await revRes.json();
-        const allReviews = (revData?.data || []) as any[];
+        const revData = (await revRes.json()) as { data?: ApiReview[] };
+        const allReviews = revData.data ?? [];
         const myReviews = allReviews.filter((r) => r.userEmail?.toLowerCase() === email);
 
         const mappedReviews = myReviews.map((r) => {
