@@ -94,8 +94,7 @@ export default function LoginPage() {
           Sign in to request books, manage inventory, or approve deliveries.
         </h1>
         <p className="mt-5 max-w-xl text-sm leading-7 text-slate-300">
-          Sign in with email/password or Google. Your session is saved against the Vercel-hosted
-          API so it survives refreshes.
+          Sign in with email/password or Google.
         </p>
 
         <div className="mt-8 space-y-4">

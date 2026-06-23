@@ -3,15 +3,44 @@ import Image from "next/image";
 import { ArrowRight, BookOpen, Sparkles, Truck, Users } from "lucide-react";
 import { BookCard } from "@/components/book-card";
 import { SectionHeading } from "@/components/section-heading";
-import {
-  categories,
-  providers,
-  siteStats,
-} from "@/lib/site-data";
+import { categories, providers, books } from "@/lib/site-data";
+import { listDeliveries } from "@/lib/persistence";
 import { getFeaturedBooksFromApi } from "@/lib/api";
+
+function formatCount(value: number) {
+  return new Intl.NumberFormat("en-US").format(value);
+}
+
+function isSameCurrentMonth(dateValue: string, referenceDate = new Date()) {
+  const date = new Date(`${dateValue}T00:00:00Z`);
+
+  return (
+    date.getUTCFullYear() === referenceDate.getUTCFullYear() &&
+    date.getUTCMonth() === referenceDate.getUTCMonth()
+  );
+}
 
 export default async function HomePage() {
   const featuredBooks = await getFeaturedBooksFromApi();
+  const deliveries = await listDeliveries();
+  const publishedBooksCount = books.filter((book) => book.status === "published").length;
+  const deliveredThisMonthCount = deliveries.filter(
+    (delivery) => delivery.status === "Delivered" && isSameCurrentMonth(delivery.date)
+  ).length;
+  const siteStats = [
+    {
+      label: "Books listed",
+      value: formatCount(publishedBooksCount),
+      note: "Across local libraries and independent owners",
+    },
+    {
+      label: "Delivered this month",
+      value: formatCount(deliveredThisMonthCount),
+      note: "Doorstep requests completed",
+    },
+    { label: "Verified reviews", value: "96%", note: "Restricted to delivered orders" },
+    { label: "Average delivery time", value: "18 min", note: "Fastest on the selected route" },
+  ];
 
   return (
     <div className="space-y-20 pb-20">
