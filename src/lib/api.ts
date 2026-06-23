@@ -53,10 +53,12 @@ function storeAuthToken(token: string | null | undefined) {
 
   if (!token) {
     window.localStorage.removeItem(authTokenKey);
+    window.dispatchEvent(new Event("bibliodrop-auth-changed"));
     return;
   }
 
   window.localStorage.setItem(authTokenKey, token);
+  window.dispatchEvent(new Event("bibliodrop-auth-changed"));
 }
 
 function resolveApiUrl(path: string) {
@@ -310,6 +312,9 @@ export async function startGoogleSignIn(callbackURL: string, role?: string) {
 
 export async function logoutUser() {
   storeAuthToken(null);
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new Event("bibliodrop-auth-changed"));
+  }
 
   await fetchJson<{ ok: boolean }>("/api/auth/logout", {
     method: "POST",

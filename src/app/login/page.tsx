@@ -7,6 +7,18 @@ import { BookOpen, Lock, Mail, ShieldCheck, Sparkles } from "lucide-react";
 import toast from "react-hot-toast";
 import { loginUser, startGoogleSignIn } from "@/lib/api";
 
+function getDashboardPath(role?: string | null) {
+  if (role === "admin") {
+    return "/dashboard/admin";
+  }
+
+  if (role === "librarian") {
+    return "/dashboard/librarian";
+  }
+
+  return "/dashboard/user";
+}
+
 export default function LoginPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -37,12 +49,13 @@ export default function LoginPage() {
       toast.success(`Welcome back, ${response.user.name}.`);
 
       const nextPath = searchParams.get("next");
+      const dashboardPath = getDashboardPath(response.user.role);
       if (nextPath) {
-        router.push(nextPath);
+        router.push(nextPath === "/dashboard" ? dashboardPath : nextPath);
         return;
       }
 
-      router.push("/");
+      router.push(dashboardPath);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Login failed.");
     } finally {

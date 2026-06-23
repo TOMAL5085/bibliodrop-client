@@ -50,8 +50,15 @@ export function SiteHeader() {
 
     loadSession();
 
+    function handleAuthChange() {
+      loadSession();
+    }
+
+    window.addEventListener("bibliodrop-auth-changed", handleAuthChange);
+
     return () => {
       active = false;
+      window.removeEventListener("bibliodrop-auth-changed", handleAuthChange);
     };
   }, []);
 
