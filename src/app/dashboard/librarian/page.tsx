@@ -138,6 +138,16 @@ export default function LibrarianDashboardPage() {
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     loadData();
+
+    function handleDeliveryChange() {
+      loadData();
+    }
+
+    window.addEventListener("bibliodrop-delivery-changed", handleDeliveryChange);
+
+    return () => {
+      window.removeEventListener("bibliodrop-delivery-changed", handleDeliveryChange);
+    };
   }, []);
 
   async function handleAddBook(event: React.FormEvent<HTMLFormElement>) {

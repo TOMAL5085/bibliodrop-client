@@ -19,7 +19,6 @@ type DeliveryRecord = {
   status: "Pending" | "Dispatched" | "Delivered";
   amount: number;
   date: string;
-  stripeSessionId?: string;
 };
 
 type ReviewRecord = {
@@ -451,29 +450,25 @@ export async function countBooks(filters?: {
   return books.filter((book) => matchesBookFilters(book, filters ?? {})).length;
 }
 
-export async function findDeliveryByStripeSessionId(sessionId: string) {
-  await seedCollections();
+export async function findActiveDeliveryForUserBook(userEmail: string, bookId: string) {
+  const deliveries = await listDeliveries();
 
-  if (isMongoEnabled()) {
-    const collections = await getCollections();
-    return (await collections?.deliveries.findOne({ stripeSessionId: sessionId })) ?? null;
-  }
-
-  return memoryStore.deliveries.find((delivery) => delivery.stripeSessionId === sessionId) ?? null;
+  return (
+    deliveries.find(
+      (delivery) =>
+        delivery.userEmail.toLowerCase() === userEmail.toLowerCase() &&
+        delivery.bookId === bookId &&
+        delivery.status !== "Delivered"
+    ) ?? null
+  );
 }
 
-export async function createDeliveryRequest(input: {
-  bookId: string;
-  userEmail: string;
-  stripeSessionId?: string;
-}) {
+export async function createDeliveryRequest(input: { bookId: string; userEmail: string }) {
   await seedCollections();
 
-  if (input.stripeSessionId) {
-    const existing = await findDeliveryByStripeSessionId(input.stripeSessionId);
-    if (existing) {
-      return existing;
-    }
+  const existing = await findActiveDeliveryForUserBook(input.userEmail, input.bookId);
+  if (existing) {
+    return existing;
   }
 
   const book = (await findBookById(input.bookId)) ?? getBookById(input.bookId);
@@ -490,7 +485,6 @@ export async function createDeliveryRequest(input: {
     status: "Pending",
     amount: book.deliveryFee,
     date: new Date().toISOString().slice(0, 10),
-    stripeSessionId: input.stripeSessionId,
   };
 
   const transaction: TransactionRecord = {

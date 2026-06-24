@@ -1,14 +1,11 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import Link from "next/link";
-import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import { BadgeCheck, BookMarked, Lock, Star, Truck } from "lucide-react";
 import { BookCard } from "@/components/book-card";
 import { SectionHeading } from "@/components/section-heading";
 import { ReviewPager } from "@/components/review-pager";
-import { DeliveryCheckoutButton } from "@/components/delivery-checkout-button";
-import { PaymentStatusToast } from "@/components/payment-status-toast";
+import { RequestDeliveryButton } from "@/components/request-delivery-button";
 import { getBookDetailsFromApi } from "@/lib/api";
 import { getBookById } from "@/lib/site-data";
 
@@ -52,9 +49,6 @@ export default async function BookDetailsPage({
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
-      <Suspense fallback={null}>
-        <PaymentStatusToast />
-      </Suspense>
       <div className="grid gap-8 lg:grid-cols-[0.95fr_1.05fr]">
         <div
           className="relative overflow-hidden rounded-[2.5rem] p-6 text-white shadow-[0_30px_90px_-35px_rgba(15,23,42,0.5)]"
@@ -142,18 +136,7 @@ export default async function BookDetailsPage({
             </div>
 
             <div className="mt-6 flex flex-wrap gap-3">
-              <Link
-                href="/login"
-                className={`inline-flex items-center gap-2 rounded-full px-5 py-3 text-sm font-semibold ${
-                  requestDisabled
-                    ? "pointer-events-none bg-slate-200 text-slate-400"
-                    : "bg-slate-950 text-white"
-                }`}
-              >
-                <Truck className="h-4 w-4" />
-                Request Delivery
-              </Link>
-              <DeliveryCheckoutButton bookId={book.id} disabled={requestDisabled} />
+              <RequestDeliveryButton bookId={book.id} disabled={requestDisabled} />
             </div>
 
             {requestDisabled ? (

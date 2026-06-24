@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { createDeliveryRequest, listDeliveries, updateDeliveryStatus } from "@/lib/persistence";
 
+export const dynamic = "force-dynamic";
+
 export async function GET() {
   const data = await listDeliveries();
   return NextResponse.json({ data });

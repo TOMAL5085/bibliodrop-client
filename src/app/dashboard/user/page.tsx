@@ -144,6 +144,16 @@ export default function UserDashboardPage() {
     }
 
     loadData();
+
+    function handleDeliveryChange() {
+      loadData();
+    }
+
+    window.addEventListener("bibliodrop-delivery-changed", handleDeliveryChange);
+
+    return () => {
+      window.removeEventListener("bibliodrop-delivery-changed", handleDeliveryChange);
+    };
   }, []);
 
   if (loading) {

@@ -7,6 +7,8 @@ import { categories, providers } from "@/lib/site-data";
 import { countBooks, listDeliveries } from "@/lib/persistence";
 import { getFeaturedBooksFromApi } from "@/lib/api";
 
+export const dynamic = "force-dynamic";
+
 function formatCount(value: number) {
   return new Intl.NumberFormat("en-US").format(value);
 }
@@ -24,8 +26,8 @@ export default async function HomePage() {
   const featuredBooks = await getFeaturedBooksFromApi();
   const deliveries = await listDeliveries();
   const publishedBooksCount = await countBooks({ status: "published" });
-  const deliveredThisMonthCount = deliveries.filter(
-    (delivery) => delivery.status === "Delivered" && isSameCurrentMonth(delivery.date)
+  const deliveriesThisMonthCount = deliveries.filter((delivery) =>
+    isSameCurrentMonth(delivery.date)
   ).length;
   const siteStats = [
     {
@@ -34,9 +36,9 @@ export default async function HomePage() {
       note: "Across local libraries and independent owners",
     },
     {
-      label: "Delivered this month",
-      value: formatCount(deliveredThisMonthCount),
-      note: "Doorstep requests completed",
+      label: "Deliveries this month",
+      value: formatCount(deliveriesThisMonthCount),
+      note: "Doorstep requests placed this month",
     },
     { label: "Verified reviews", value: "96%", note: "Restricted to delivered orders" },
     { label: "Average delivery time", value: "18 min", note: "Fastest on the selected route" },

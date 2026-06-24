@@ -384,12 +384,12 @@ export async function uploadImage(file: File) {
   return data?.url ?? null;
 }
 
-export async function startStripeCheckout(bookId: string) {
-  return fetchSameOriginJson<{ url: string; sessionId: string }>("/api/stripe/checkout", {
+export async function requestDelivery(payload: { bookId: string; userEmail: string }) {
+  return fetchSameOriginJson<{ data: { id: string; status: string } }>("/api/deliveries", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ bookId }),
+    body: JSON.stringify(payload),
   });
 }
