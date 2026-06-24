@@ -100,6 +100,37 @@ async function fetchJson<T>(path: string, init?: RequestInit): Promise<T | null>
   }
 }
 
+async function fetchSameOriginJson<T>(path: string, init?: RequestInit): Promise<T | null> {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 10000);
+  const token = getStoredAuthToken();
+
+  try {
+    const headers = new Headers(init?.headers);
+    if (token && !headers.has("Authorization")) {
+      headers.set("Authorization", `Bearer ${token}`);
+    }
+
+    const response = await fetch(path, {
+      ...init,
+      headers,
+      signal: controller.signal,
+      cache: "no-store",
+      credentials: "include",
+    });
+
+    if (!response.ok) {
+      return null;
+    }
+
+    return (await response.json()) as T;
+  } catch {
+    return null;
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
 function toAppUser(user: {
   id: string;
   name: string;
@@ -351,4 +382,14 @@ export async function uploadImage(file: File) {
 
   const data = (await response.json().catch(() => null)) as { url?: string } | null;
   return data?.url ?? null;
+}
+
+export async function startStripeCheckout(bookId: string) {
+  return fetchSameOriginJson<{ url: string; sessionId: string }>("/api/stripe/checkout", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ bookId }),
+  });
 }

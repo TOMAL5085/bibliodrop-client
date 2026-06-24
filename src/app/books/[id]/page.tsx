@@ -1,11 +1,14 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import { Suspense } from "react";
 import { notFound } from "next/navigation";
-import { ArrowRight, BadgeCheck, BookMarked, Lock, Star, Truck } from "lucide-react";
+import { BadgeCheck, BookMarked, Lock, Star, Truck } from "lucide-react";
 import { BookCard } from "@/components/book-card";
 import { SectionHeading } from "@/components/section-heading";
 import { ReviewPager } from "@/components/review-pager";
+import { DeliveryCheckoutButton } from "@/components/delivery-checkout-button";
+import { PaymentStatusToast } from "@/components/payment-status-toast";
 import { getBookDetailsFromApi } from "@/lib/api";
 import { getBookById } from "@/lib/site-data";
 
@@ -49,6 +52,9 @@ export default async function BookDetailsPage({
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+      <Suspense fallback={null}>
+        <PaymentStatusToast />
+      </Suspense>
       <div className="grid gap-8 lg:grid-cols-[0.95fr_1.05fr]">
         <div
           className="relative overflow-hidden rounded-[2.5rem] p-6 text-white shadow-[0_30px_90px_-35px_rgba(15,23,42,0.5)]"
@@ -147,13 +153,7 @@ export default async function BookDetailsPage({
                 <Truck className="h-4 w-4" />
                 Request Delivery
               </Link>
-              <button
-                disabled={requestDisabled}
-                className="inline-flex items-center gap-2 rounded-full border border-slate-300 px-5 py-3 text-sm font-semibold text-slate-700 disabled:opacity-50"
-              >
-                <ArrowRight className="h-4 w-4" />
-                Stripe checkout placeholder
-              </button>
+              <DeliveryCheckoutButton bookId={book.id} disabled={requestDisabled} />
             </div>
 
             {requestDisabled ? (
