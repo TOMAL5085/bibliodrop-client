@@ -8,7 +8,7 @@ import {
 } from "@/lib/site-data";
 import { normalizeUser, type AppRole } from "@/lib/auth-user";
 
-type ApiBook = {
+export type ApiBook = {
   id: string;
   title: string;
   author: string;
@@ -71,7 +71,7 @@ function resolveApiUrl(path: string) {
 
 async function fetchJson<T>(path: string, init?: RequestInit): Promise<T | null> {
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 2500);
+  const timeout = setTimeout(() => controller.abort(), 10000);
   const token = getStoredAuthToken();
 
   try {
@@ -100,7 +100,7 @@ async function fetchJson<T>(path: string, init?: RequestInit): Promise<T | null>
   }
 }
 
-async function fetchSameOriginJson<T>(path: string, init?: RequestInit): Promise<T | null> {
+async function fetchJsonWithError<T>(path: string, init?: RequestInit): Promise<T> {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 10000);
   const token = getStoredAuthToken();
@@ -111,7 +111,7 @@ async function fetchSameOriginJson<T>(path: string, init?: RequestInit): Promise
       headers.set("Authorization", `Bearer ${token}`);
     }
 
-    const response = await fetch(path, {
+    const response = await fetch(resolveApiUrl(path), {
       ...init,
       headers,
       signal: controller.signal,
@@ -119,13 +119,13 @@ async function fetchSameOriginJson<T>(path: string, init?: RequestInit): Promise
       credentials: "include",
     });
 
+    const payload = (await response.json().catch(() => null)) as { message?: string } | null;
+
     if (!response.ok) {
-      return null;
+      throw new Error(payload?.message || "Request failed");
     }
 
-    return (await response.json()) as T;
-  } catch {
-    return null;
+    return payload as T;
   } finally {
     clearTimeout(timeout);
   }
@@ -202,6 +202,10 @@ export async function getBrowseBooksFromApi(filters: {
   }
 
   let result = booksResponse.data.map(normalizeApiBook);
+
+  if (!filters.status) {
+    result = result.filter((book) => book.status === "published");
+  }
 
   if (filters.fee === "under-120") {
     result = result.filter((book) => book.deliveryFee < 120);
@@ -384,8 +388,62 @@ export async function uploadImage(file: File) {
   return data?.url ?? null;
 }
 
+export async function getAllBooksFromApi() {
+  const response = await fetchJson<{ data: ApiBook[] }>("/api/books");
+  return response?.data ?? [];
+}
+
+export type ApiDelivery = {
+  id: string;
+  userEmail?: string;
+  librarianEmail?: string;
+  bookId: string;
+  date: string;
+  status: string;
+  amount: number;
+};
+
+export type ApiReview = {
+  id: string;
+  userEmail?: string;
+  bookId: string;
+  rating: number;
+  comment: string;
+  date?: string;
+};
+
+export async function getDeliveriesFromApi() {
+  const response = await fetchJson<{ data: ApiDelivery[] }>("/api/deliveries");
+  return response?.data ?? [];
+}
+
+export async function getAllReviewsFromApi() {
+  const response = await fetchJson<{ data: ApiReview[] }>("/api/reviews");
+  return response?.data ?? [];
+}
+
+export async function createBookOnApi(payload: Record<string, unknown>) {
+  return fetchJsonWithError<{ data: ApiBook }>("/api/books", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function updateDeliveryOnApi(payload: { id: string; status: string }) {
+  return fetchJsonWithError<{ data: ApiDelivery }>("/api/deliveries", {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+}
+
 export async function requestDelivery(payload: { bookId: string; userEmail: string }) {
-  return fetchSameOriginJson<{ data: { id: string; status: string } }>("/api/deliveries", {
+  return fetchJsonWithError<{ data: ApiDelivery }>("/api/deliveries", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

@@ -1,6 +1,8 @@
 import { CategoryPieChart, RevenueChart } from "@/components/charts";
 import { SectionHeading } from "@/components/section-heading";
-import { countBooks, countUsers, listBooks, listTransactions } from "@/lib/persistence";
+import { countUsers } from "@/lib/persistence";
+import { getBooksForPage, getTransactionsForPage } from "@/lib/server-api";
+import type { Book } from "@/lib/site-data";
 
 export const dynamic = "force-dynamic";
 
@@ -47,13 +49,22 @@ async function getLiveUserCount() {
 }
 
 export default async function AdminDashboardPage() {
-  const [totalUsers, books, transactions] = await Promise.all([
+  const [totalUsers, booksRaw, transactionsRaw] = await Promise.all([
     getLiveUserCount(),
-    listBooks({}),
-    listTransactions(),
+    getBooksForPage(),
+    getTransactionsForPage(),
   ]);
 
-  const totalBooks = await countBooks();
+  const books = booksRaw as Book[];
+  const transactions = transactionsRaw as Array<{
+    id: string;
+    userEmail: string;
+    librarianEmail: string;
+    amount: number;
+    date: string;
+  }>;
+
+  const totalBooks = books.length;
   const publishedBooks = books.filter((book) => book.status === "published").length;
   const pendingApproval = books.filter((book) => book.status === "pending_approval").length;
   const checkedOutBooks = books.filter((book) => book.availability === "Checked Out").length;

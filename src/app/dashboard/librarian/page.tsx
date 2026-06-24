@@ -4,7 +4,16 @@ import { useEffect, useState, type ChangeEvent } from "react";
 import Link from "next/link";
 import { ActivityBarChart } from "@/components/charts";
 import { SectionHeading } from "@/components/section-heading";
-import { getSession, uploadImage } from "@/lib/api";
+import {
+  getSession,
+  uploadImage,
+  getAllBooksFromApi,
+  getDeliveriesFromApi,
+  createBookOnApi,
+  updateDeliveryOnApi,
+  type ApiBook,
+  type ApiDelivery,
+} from "@/lib/api";
 import toast from "react-hot-toast";
 
 type BookRow = {
@@ -30,26 +39,6 @@ type Metric = {
   delta: string;
 };
 
-type ApiBook = {
-  id: string;
-  author: string;
-  deliveryFee: number;
-  providerEmail?: string;
-  provider?: string;
-  title?: string;
-  category?: string;
-  status?: string;
-};
-
-type ApiDelivery = {
-  id: string;
-  librarianEmail?: string;
-  userEmail?: string;
-  bookId: string;
-  status: string;
-  amount: number;
-};
-
 export default function LibrarianDashboardPage() {
   const [loading, setLoading] = useState(true);
   const [metrics, setMetrics] = useState<Metric[]>([]);
@@ -70,9 +59,7 @@ export default function LibrarianDashboardPage() {
       setUserName(name);
 
       // Fetch books
-      const booksRes = await fetch("/api/books");
-      const booksData = (await booksRes.json()) as { data?: ApiBook[] };
-      const allBooks = booksData.data ?? [];
+      const allBooks = await getAllBooksFromApi();
 
       // Filter librarian's books
       const myBooks = allBooks
@@ -91,9 +78,7 @@ export default function LibrarianDashboardPage() {
         }));
 
       // Fetch deliveries
-      const delRes = await fetch("/api/deliveries");
-      const delData = (await delRes.json()) as { data?: ApiDelivery[] };
-      const allDeliveries = delData.data ?? [];
+      const allDeliveries = await getDeliveriesFromApi();
 
       // Filter librarian's deliveries
       const myDeliveries = allDeliveries.filter(
@@ -166,30 +151,23 @@ export default function LibrarianDashboardPage() {
     }
 
     try {
-      const res = await fetch("/api/books", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          title,
-          author,
-          description,
-          deliveryFee,
-          category,
-          coverImage,
-          provider: userName || "Librarian",
-          providerEmail: userEmail,
-        }),
+      await createBookOnApi({
+        title,
+        author,
+        description,
+        deliveryFee,
+        category,
+        coverImage,
+        provider: userName || "Librarian",
+        providerEmail: userEmail,
       });
 
-      if (res.ok) {
-        toast.success("Book listed successfully.");
-        event.currentTarget.reset();
-        loadData();
-      } else {
-        toast.error("Failed to add book.");
-      }
-    } catch {
-      toast.error("An error occurred. Please try again.");
+      toast.success("Book listed successfully.");
+      event.currentTarget.reset();
+      setCoverImageUrl("");
+      loadData();
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Failed to add book.");
     }
   }
 
@@ -220,20 +198,12 @@ export default function LibrarianDashboardPage() {
 
   async function updateStatus(deliveryId: string, newStatus: string) {
     try {
-      const res = await fetch("/api/deliveries", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: deliveryId, status: newStatus }),
-      });
-
-      if (res.ok) {
-        toast.success(`Status updated to ${newStatus}.`);
-        loadData();
-      } else {
-        toast.error("Failed to update status.");
-      }
-    } catch {
-      toast.error("An error occurred. Please try again.");
+      await updateDeliveryOnApi({ id: deliveryId, status: newStatus });
+      toast.success(`Status updated to ${newStatus}.`);
+      window.dispatchEvent(new Event("bibliodrop-delivery-changed"));
+      loadData();
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Failed to update status.");
     }
   }
 

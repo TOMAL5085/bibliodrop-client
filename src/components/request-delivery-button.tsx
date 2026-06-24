@@ -31,16 +31,12 @@ export function RequestDeliveryButton({ bookId, disabled = false }: RequestDeliv
       }
 
       const result = await requestDelivery({ bookId, userEmail: session.user.email });
-      if (!result) {
-        toast.error("Unable to request delivery. Try again in a moment.");
-        return;
-      }
 
       toast.success("Delivery requested. Dashboard stats will update shortly.");
       window.dispatchEvent(new Event("bibliodrop-delivery-changed"));
       router.refresh();
-    } catch {
-      toast.error("Unable to request delivery. Try again in a moment.");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Unable to request delivery.");
     } finally {
       setLoading(false);
     }

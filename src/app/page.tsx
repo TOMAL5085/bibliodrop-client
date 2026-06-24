@@ -4,7 +4,7 @@ import { ArrowRight, BookOpen, Sparkles, Truck, Users } from "lucide-react";
 import { BookCard } from "@/components/book-card";
 import { SectionHeading } from "@/components/section-heading";
 import { categories, providers } from "@/lib/site-data";
-import { countBooks, listDeliveries } from "@/lib/persistence";
+import { getDeliveriesForPage, getBooksCountForPage } from "@/lib/server-api";
 import { getFeaturedBooksFromApi } from "@/lib/api";
 
 export const dynamic = "force-dynamic";
@@ -24,8 +24,8 @@ function isSameCurrentMonth(dateValue: string, referenceDate = new Date()) {
 
 export default async function HomePage() {
   const featuredBooks = await getFeaturedBooksFromApi();
-  const deliveries = await listDeliveries();
-  const publishedBooksCount = await countBooks({ status: "published" });
+  const deliveries = await getDeliveriesForPage();
+  const publishedBooksCount = await getBooksCountForPage({ status: "published" });
   const deliveriesThisMonthCount = deliveries.filter((delivery) =>
     isSameCurrentMonth(delivery.date)
   ).length;
