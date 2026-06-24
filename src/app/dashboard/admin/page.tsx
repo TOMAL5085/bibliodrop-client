@@ -23,18 +23,27 @@ async function getLiveUserCount() {
         cache: "no-store",
       });
 
-      if (response.ok) {
-        const payload = (await response.json()) as {
-          data?: { stats?: Array<{ label: string; value: string | number }> };
-        };
+          if (response.ok) {
+        const payload = (await response.json()) as any;
 
-        const totalUsersStat = payload.data?.stats?.find((stat) => stat.label === "Total users");
+        // Support two response shapes:
+        // { data: { stats: [{ label, value }, ...] } }
+        // { data: [{ label, value }, ...] }
+        let stats: Array<{ label: string; value: string | number }> | undefined;
+
+        if (payload?.data?.stats && Array.isArray(payload.data.stats)) {
+          stats = payload.data.stats;
+        } else if (Array.isArray(payload?.data)) {
+          stats = payload.data;
+        }
+
+        const totalUsersStat = stats?.find((stat) => stat.label === "Total users");
         if (typeof totalUsersStat?.value === "number") {
           return totalUsersStat.value;
         }
 
         if (typeof totalUsersStat?.value === "string") {
-          const parsedValue = Number(totalUsersStat.value.replace(/[^0-9]/g, ""));
+          const parsedValue = Number(String(totalUsersStat.value).replace(/[^0-9]/g, ""));
           if (!Number.isNaN(parsedValue)) {
             return parsedValue;
           }

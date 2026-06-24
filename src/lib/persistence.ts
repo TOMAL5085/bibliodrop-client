@@ -536,6 +536,22 @@ export async function createDeliveryRequest(input: { bookId: string; userEmail: 
   } else {
     memoryStore.deliveries.push(record);
     memoryStore.transactions.push(transaction);
+
+    // Auto-complete the delivery after 60 seconds to simulate real delivery flow in memory mode
+    setTimeout(() => {
+      const delivery = memoryStore.deliveries.find((d) => d.id === record.id);
+      if (delivery && delivery.status !== "Delivered") {
+        delivery.status = "Delivered";
+
+        // Increment associated book deliveries counter where possible
+        const book = memoryStore.books.find((b) => b.id === record.bookId);
+        if (book) {
+          // Ensure deliveries field exists and increment
+          // @ts-ignore
+          book.deliveries = (book.deliveries || 0) + 1;
+        }
+      }
+    }, 60 * 1000);
   }
 
   return record;
@@ -611,14 +627,26 @@ export async function listTransactions() {
   return [...memoryStore.transactions];
 }
 
-export function getDashboardPayload(role: string) {
-  const response = {
-    user: dashboardMetrics.user,
-    librarian: dashboardMetrics.librarian,
-    admin: dashboardMetrics.admin,
-  };
+export async function getDashboardPayload(role: string) {
+  // For admin dashboard, compute dynamic values where possible
+  if (role === "admin") {
+    const usersCount = await countUsers();
+    const booksCount = await countBooks();
+    const transactions = await listTransactions();
+    const totalRevenue = transactions.reduce((sum, t) => sum + (t.amount || 0), 0);
 
-  return response[role as keyof typeof response] ?? null;
+    return [
+      { label: "Total users", value: usersCount, delta: "Live accounts across all roles" },
+      { label: "Total books", value: booksCount, delta: "Live inventory across providers" },
+      { label: "Total revenue", value: `BDT ${totalRevenue}`, delta: "From the current live transactions" },
+    ];
+  }
+
+  // For other roles, fall back to site-data dashboard metrics
+  if (role === "user") return dashboardMetrics.user;
+  if (role === "librarian") return dashboardMetrics.librarian;
+
+  return null;
 }
 
 export async function getBooksFromApi(filters: {
@@ -726,12 +754,29 @@ export async function updateDeliveryStatus(id: string, status: "Pending" | "Disp
       { $set: { status } },
       { returnDocument: "after" }
     );
+
+    // If delivered, increment book deliveries counter in DB
+    const resultAny = result as any;
+    if (resultAny?.value && status === "Delivered") {
+      const bookId = resultAny.value.bookId;
+      await collections?.books.updateOne({ id: bookId }, { $inc: { deliveries: 1 } });
+    }
+
     return result ?? null;
   }
 
   const delivery = memoryStore.deliveries.find((d) => d.id === id);
   if (delivery) {
     delivery.status = status;
+
+    if (status === "Delivered") {
+      const book = memoryStore.books.find((b) => b.id === delivery.bookId);
+      if (book) {
+        // @ts-ignore
+        book.deliveries = (book.deliveries || 0) + 1;
+      }
+    }
+
     return delivery;
   }
 

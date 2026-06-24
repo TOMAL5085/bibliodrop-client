@@ -33,14 +33,30 @@ async function fetchFromApi<T>(path: string): Promise<T | null> {
 }
 
 export async function getDeliveriesForPage() {
-  const response = await fetchFromApi<{ data: Array<{ date: string; status: string }> }>(
+  const response = await fetchFromApi<{ data: Array<{ id: string; date: string; status: string; userEmail?: string; bookId?: string; amount?: number }> }>(
     "/api/deliveries"
   );
+
+  // Always merge API response with local deliveries to avoid missing seeded local data
+  const local = await listDeliveries();
+
   if (response?.data) {
-    return response.data;
+    const mergedMap = new Map<string, any>();
+
+    // Add local entries first
+    for (const d of local) {
+      mergedMap.set(d.id, d);
+    }
+
+    // Overwrite/add entries from API
+    for (const d of response.data) {
+      mergedMap.set(d.id, d);
+    }
+
+    return Array.from(mergedMap.values());
   }
 
-  return await listDeliveries();
+  return local;
 }
 
 export async function getBooksCountForPage(filters?: {
