@@ -111,8 +111,24 @@ const memoryStore = {
     photoUrl: "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=256&h=256&fit=crop",
     passwordHash: hashPassword("Password@123"),
   },
+  {
+    id: "u8",
+    name: "Imran Hassan",
+    email: "imran@example.com",
+    role: "librarian" as AuthRole,
+    photoUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=256&h=256&fit=crop",
+    passwordHash: hashPassword("Password@123"),
+  },
+  {
+    id: "u9",
+    name: "Fatima Khan",
+    email: "fatima@example.com",
+    role: "user" as AuthRole,
+    photoUrl: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=256&h=256&fit=crop",
+    passwordHash: hashPassword("Password@123"),
+  },
     {
-      id: "u8",
+      id: "u10",
       name: "Admin",
       email: "admin@gmail.com",
       role: "admin" as AuthRole,
@@ -149,6 +165,15 @@ const memoryStore = {
       amount: 115,
       date: "2026-06-16",
     },
+    {
+      id: "d4",
+      userEmail: "fatima@example.com",
+      librarianEmail: "nayeem@example.com",
+      bookId: "signal-after-dawn",
+      status: "Delivered" as const,
+      amount: 160,
+      date: "2026-06-18",
+    },
   ] as DeliveryRecord[],
   reviews: Object.entries(reviewsByBook).flatMap(([bookId, items]) =>
     items.map((item) => ({
@@ -161,7 +186,16 @@ const memoryStore = {
       date: item.date,
     }))
   ) as ReviewRecord[],
-  transactions: [...seededTransactions] as TransactionRecord[],
+  transactions: [
+    ...seededTransactions,
+    {
+      id: "txn_04",
+      userEmail: "fatima@example.com",
+      librarianEmail: "nayeem@example.com",
+      amount: 160,
+      date: "2026-06-18",
+    },
+  ] as TransactionRecord[],
 };
 
 let clientPromise: Promise<MongoClient> | null = null;

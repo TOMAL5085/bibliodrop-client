@@ -12,6 +12,7 @@ import {
   type ApiBook,
   type ApiReview,
 } from "@/lib/api";
+import toast from "react-hot-toast";
 
 type DeliveryRow = {
   id: string;
@@ -19,6 +20,7 @@ type DeliveryRow = {
   date: string;
   status: string;
   fee: number;
+  bookId?: string;
 };
 
 type UserReview = {
@@ -41,6 +43,10 @@ export default function UserDashboardPage() {
   const [deliveries, setDeliveries] = useState<DeliveryRow[]>([]);
   const [readingList, setReadingList] = useState<string[]>([]);
   const [reviews, setReviews] = useState<UserReview[]>([]);
+  const [userEmail, setUserEmail] = useState<string>("");
+  const [reviewingBookId, setReviewingBookId] = useState<string | null>(null);
+  const [reviewFormData, setReviewFormData] = useState({ rating: 5, comment: "" });
+  const [submittingReview, setSubmittingReview] = useState(false);
 
   useEffect(() => {
     async function loadData() {
@@ -48,6 +54,7 @@ export default function UserDashboardPage() {
         const session = await getSession();
         if (!session?.user) return;
         const email = session.user.email.toLowerCase();
+        setUserEmail(email);
 
         const allDeliveries = await getDeliveriesFromApi();
         const allBooks = await getAllBooksFromApi();
@@ -66,6 +73,7 @@ export default function UserDashboardPage() {
             date: d.date,
             status: d.status,
             fee: d.amount,
+            bookId: d.bookId,
           };
         });
 
@@ -124,10 +132,68 @@ export default function UserDashboardPage() {
 
     window.addEventListener("bibliodrop-delivery-changed", handleDeliveryChange);
 
+    // Auto-refresh every 60 seconds to check for delivery status changes
+    const interval = setInterval(loadData, 60000);
+
     return () => {
       window.removeEventListener("bibliodrop-delivery-changed", handleDeliveryChange);
+      clearInterval(interval);
     };
   }, []);
+
+  async function handleSubmitReview(bookId: string) {
+    if (!reviewFormData.comment.trim()) {
+      toast.error("Please write a comment");
+      return;
+    }
+
+    setSubmittingReview(true);
+    try {
+      const response = await fetch("/api/reviews", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          bookId,
+          userEmail,
+          rating: reviewFormData.rating,
+          comment: reviewFormData.comment,
+        }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        toast.error(error.message || "Failed to submit review");
+        return;
+      }
+
+      toast.success("Review submitted!");
+      setReviewingBookId(null);
+      setReviewFormData({ rating: 5, comment: "" });
+
+      // Reload reviews
+      const allReviews = await getAllReviewsFromApi();
+      const myReviews = allReviews.filter((r) => r.userEmail?.toLowerCase() === userEmail);
+      const allBooks = await getAllBooksFromApi();
+
+      const mappedReviews = myReviews.map((r) => {
+        const book = allBooks.find((b) => b.id === r.bookId);
+        return {
+          id: r.id,
+          title: book ? book.title : r.bookId,
+          rating: r.rating,
+          comment: r.comment,
+          date: r.date || "Just now",
+        };
+      });
+
+      setReviews(mappedReviews);
+    } catch (err) {
+      console.error(err);
+      toast.error("Error submitting review");
+    } finally {
+      setSubmittingReview(false);
+    }
+  }
 
   if (loading) {
     return (
@@ -243,6 +309,81 @@ export default function UserDashboardPage() {
             )}
           </div>
         </div>
+      </div>
+
+      <div className="glass-panel rounded-[2rem] p-6">
+        <h2 className="text-xl font-semibold text-slate-950">Write a review</h2>
+        <p className="mt-2 text-sm text-slate-600">Share your thoughts about books you've received.</p>
+        
+        {reviewingBookId ? (
+          <div className="mt-6 space-y-4 border-t border-slate-200 pt-6">
+            <div className="flex items-center justify-between">
+              <h3 className="font-medium text-slate-950">Rating</h3>
+              <select
+                value={reviewFormData.rating}
+                onChange={(e) =>
+                  setReviewFormData({ ...reviewFormData, rating: Number(e.target.value) })
+                }
+                className="rounded-lg border border-slate-300 px-3 py-2 text-sm"
+              >
+                {[5, 4, 3, 2, 1].map((rating) => (
+                  <option key={rating} value={rating}>
+                    {rating} stars
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-slate-700">Your comment</label>
+              <textarea
+                value={reviewFormData.comment}
+                onChange={(e) =>
+                  setReviewFormData({ ...reviewFormData, comment: e.target.value })
+                }
+                placeholder="Share your thoughts..."
+                className="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+                rows={4}
+              />
+            </div>
+            <div className="flex gap-2">
+              <button
+                onClick={() => handleSubmitReview(reviewingBookId)}
+                disabled={submittingReview}
+                className="rounded-lg bg-amber-600 px-4 py-2 text-sm font-semibold text-white hover:bg-amber-700 disabled:opacity-50"
+              >
+                {submittingReview ? "Submitting..." : "Submit review"}
+              </button>
+              <button
+                onClick={() => {
+                  setReviewingBookId(null);
+                  setReviewFormData({ rating: 5, comment: "" });
+                }}
+                className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div className="mt-6 space-y-2">
+            {deliveries
+              .filter((d) => d.status === "Delivered")
+              .filter((d) => !reviews.some((r) => r.title === d.title))
+              .map((delivery) => (
+                <button
+                  key={delivery.id}
+                  onClick={() => setReviewingBookId(delivery.bookId || "")}
+                  className="block w-full rounded-lg border border-slate-200 bg-white p-4 text-left hover:bg-slate-50"
+                >
+                  <p className="font-semibold text-slate-950">{delivery.title}</p>
+                  <p className="text-xs text-slate-500">Click to review</p>
+                </button>
+              ))}
+            {deliveries.filter((d) => d.status === "Delivered" && !reviews.some((r) => r.title === d.title)).length === 0 && (
+              <p className="text-sm text-slate-500 py-6 text-center">No unreviewed delivered books yet.</p>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
